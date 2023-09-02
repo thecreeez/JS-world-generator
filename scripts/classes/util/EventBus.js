@@ -10,6 +10,7 @@ class EventBus {
     RENDER_FRAME_END: "render_frame_end",
 
     GENERATING_WORLD_START: "generating_world_start",
+    
     GENERATING_WORLD_END: "generating_world_end",
 
     GENERATE_WORLD_REQUEST: "generate_world_request"

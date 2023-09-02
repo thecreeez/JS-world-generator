@@ -5,6 +5,8 @@ class Application {
   static World;
   static DEBUG_MODE = false;
 
+  static CHUNK_GENERATION_PER_TICK = 3;
+
   static RandomTypes = {
     FullRandom: "Случайно",
     SeedRandom: "Псевдослучайно"
@@ -14,7 +16,7 @@ class Application {
 
   static Profilers = {
     FPS_PROFILER: DebugHelper.createProfiler(),
-    WORLD_GENERATION_PROFILER: DebugHelper.createProfiler()
+    UPS_PROFILER: DebugHelper.createProfiler(),
   }
 
   static start({ debug = false, ticksPerSecond = 60, fpsMax = 144 }) {

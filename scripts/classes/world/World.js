@@ -1,6 +1,14 @@
 class World {
 
-  static DefaultSize = [1500, 1000]
+  static DefaultSize = [1000, 1000]
+  static SliceSize = [50, 50]
+
+  static States = {
+    INIT: "init",
+    GENERATING: "generating",
+    MESHING: "meshing",
+    IDLE: "idle"
+  }
 
   static Biomes = {
     OCEAN: {
@@ -97,27 +105,7 @@ class World {
     this._seed = seed;
     this.offset = offset;
 
-    this._mesh = null;
-
-    Application.EventBus.invoke(EventBus.TYPES.GENERATING_WORLD_START);
-
-    Application.Profilers.WORLD_GENERATION_PROFILER.startTask("preparing");
-    this._prepareToGenerateChunks();
-    Application.Profilers.WORLD_GENERATION_PROFILER.endTask("preparing");
-
-    Application.Profilers.WORLD_GENERATION_PROFILER.startTask("generating biomes");
-    this._generateBiomes(offset);
-    Application.Profilers.WORLD_GENERATION_PROFILER.endTask("generating biomes");
-
-    Application.Profilers.WORLD_GENERATION_PROFILER.startTask("generating chunks");
-    this._generateHeights(offset);
-    Application.Profilers.WORLD_GENERATION_PROFILER.endTask("generating chunks");
-
-    Application.Profilers.WORLD_GENERATION_PROFILER.startTask("generating mesh");
-    this._generateMesh();
-    Application.Profilers.WORLD_GENERATION_PROFILER.endTask("generating mesh");
-
-    Application.EventBus.invoke(EventBus.TYPES.GENERATING_WORLD_END);
+    this._state = World.States.INIT;
   }
 
   _prepareToGenerateChunks() {
@@ -142,8 +130,8 @@ class World {
   _generateBiomes(offset) {
     let biomeNoise = PerlinNoiseGenerator.noise({
       size: [this._size[0] + 20, this._size[1] + 20],
-      times: 12,
-      step: 0.5,
+      times: 40,
+      step: 0.4,
       seed: this._seed * 2,
       offset
     })
@@ -212,8 +200,8 @@ class World {
   _createRenderQueue() {
     this._renderQueue = [];
 
-    for (let y = 0; y < this._size[1]; y++) {
-      for (let x = 0; x < this._size[0]; x++) {
+    for (let y = 0; y < this._chunks.length; y++) {
+      for (let x = 0; x < this._chunks[y].length; x++) {
         this._renderQueue.push({
           chunk: this._chunks[y][x],
           pos: [x, y]
@@ -224,12 +212,12 @@ class World {
     this._renderQueue.sort((a, b) => a.chunk.getHeightWithBiomeHeight() - b.chunk.getHeightWithBiomeHeight());
   }
 
-  _getChunkType(chunk) {
-    let chunkType = this._getMaxHeightChunk(chunk.getBiome());
+  getChunkType(biome, height) {
+    let chunkType = this._getMaxHeightChunk(biome);
 
-    for (let candidateChunkId in chunk.getBiome().chunks) {
-      if (chunk.getHeight() < chunk.getBiome().chunks[candidateChunkId].height && chunk.getBiome().chunks[candidateChunkId].height < chunkType.height) {
-        chunkType = chunk.getBiome().chunks[candidateChunkId]
+    for (let candidateChunkId in biome.chunks) {
+      if (height < biome.chunks[candidateChunkId].height && biome.chunks[candidateChunkId].height < chunkType.height) {
+        chunkType = biome.chunks[candidateChunkId]
       }
     }
 
@@ -248,7 +236,7 @@ class World {
     return max;
   }
 
-  _getBiome(chunkValue) {
+  getBiome(chunkValue) {
     let currentBiome = this._getMaxHeightBiome();
 
     for (let biomeName in World.Biomes) {
@@ -273,6 +261,7 @@ class World {
 
   render() {
     if (!this._cache || this._needToRebuildCache) {
+      return;
       this._generateMesh();
     }
 
@@ -280,10 +269,48 @@ class World {
   }
 
   update() {
-
+    switch (this._state) {
+      case (World.States.INIT): WorldGenerator.init(this); return;
+      case (World.States.GENERATING): WorldGenerator.generate(this); return;
+      case (World.States.IDLE): return;
+    }
   }
 
   getChunkSize() {
     return canvas.height / this._size[1] < canvas.width / this._size[0] ? canvas.height / this._size[1] : canvas.width / this._size[0];
+  }
+
+  setState(state) {
+    this._state = state;
+  }
+  getState() {
+    return this._state;
+  }
+
+  getChunks() {
+    return this._chunks;
+  }
+
+  setChunk(x, y, chunk) {
+    if (x < 0 || x > this._size[0]) {
+      console.error(`x pos out of bounds.`)
+      return;
+    }
+
+    if (y < 0 || y > this._size[1]) {
+      console.error(`y pos out of bounds.`)
+      return;
+    }
+
+    this._chunks[y][x] = chunk;
+  }
+
+  getChunk(x, y) {
+    if (y < 0 || y > this._size[1]) {
+      console.error(`y pos out of bounds.`)
+      return;
+    }
+
+    return this._chunks[y][x];
   }
 }

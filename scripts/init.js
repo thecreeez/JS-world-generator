@@ -6,8 +6,12 @@ const UIManagerInstance = new UIManager(document.querySelector("canvas"));
 window.onload = () => {
   start();
   setInterval(update, 1000 / TICKS_PER_SECOND);
+  setInterval(() => {
+    DebugHelper.count();
+  }, 1000)
 
   UIManagerInstance.addElement("MainMenu", UIStorage.MAIN_UI(UIManagerInstance));
+  UIManagerInstance.addElement("DebugMenu", UIStorage.DEBUG_MENU(UIManagerInstance));
 
   document.querySelector("canvas").onmousemove = (e) => {
     UIManagerInstance.onmousemove([e.clientX, e.clientY]);

@@ -298,4 +298,30 @@ class UIStorage {
 
     return container;
   }
+
+  static DEBUG_MENU(manager) {
+    let container = new UIContainer({
+      manager,
+      pos: [0,0],
+      isActive: true,
+      isRender: true,
+      name: "Debug"
+    })
+
+    container.addElement(`UpsAndFpsLabel`, new UILabel({
+      manager,
+      isRender: true,
+      text: `FPS: 0 UPS: 0`
+    }))
+
+    container.addElement(`ProfilerDataContainer`, new UIContainer({
+      manager,
+      pos: [0,0],
+      isActive: true,
+      isRender: true,
+      name: "Profiler"
+    }))
+
+    return container;
+  }
 }

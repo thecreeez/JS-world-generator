@@ -26,6 +26,10 @@ class UIManager {
       return this.error("Can't add element. Id is already used.")
     }
 
+    if (!element || !element.render || !element.update) {
+      return this.error("Can't add element. Bugged element.")
+    }
+
     this._elements.set(id, element);
 
     return element;

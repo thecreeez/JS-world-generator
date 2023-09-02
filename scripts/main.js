@@ -5,26 +5,29 @@ const ctx = canvas.getContext("2d");
 
 let WORLD;
 
-let noiseStep = 0.0001;
-
 function start() {
-  //setInterval(drawIsland, 500)
+  
 }
 
-function drawIsland() {
-  UIManagerInstance.getElement("MainMenu").getElement("PerlinNoiseStepSlider").setValue(noiseStep);
-  noiseStep += 0.001;
-  UIManagerInstance.getElement("MainMenu").getElement("ButtonTest").emulateClick();
+async function update() {
+  updateAsync();
+  renderAsync();
 }
 
-function update() {
+async function renderAsync() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  if (WORLD) {
-    WORLD.update();
+  if (WORLD)
     WORLD.render();
-  }
+
+  UIManagerInstance.render();
+  DebugHelper.render();
+}
+
+async function updateAsync() {
+  if (WORLD)
+    WORLD.update();
 
   UIManagerInstance.update();
-  UIManagerInstance.render();
+  DebugHelper.update();
 }

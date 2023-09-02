@@ -9,12 +9,20 @@ class World {
   static TICK_SPEED = 1;
   static method = World.METHODS.SEED_RANDOM;
 
+  static GENERATE_PROFILER;
+
   static generateChunks({ chunkTypesSettings, perlinNoiseStep = 0.1, perlinNoiseTimes = 10, seed = 125 }) {
     let chunks = [];
 
+    World.GENERATE_PROFILER.startTask("Height noise");
     let heightNoise = PerlinNoiseGenerator.noise(World.SIZE[0], World.SIZE[1], perlinNoiseTimes, perlinNoiseStep, seed );
-    let alphaNoise = PerlinNoiseGenerator.noise(World.SIZE[0], World.SIZE[1], perlinNoiseTimes, perlinNoiseStep, seed + 25 );
+    World.GENERATE_PROFILER.endTask("Height noise");
 
+    World.GENERATE_PROFILER.startTask("Alpha noise");
+    let alphaNoise = PerlinNoiseGenerator.noise(World.SIZE[0], World.SIZE[1], perlinNoiseTimes, perlinNoiseStep, seed + 25 );
+    World.GENERATE_PROFILER.endTask("Alpha noise");
+
+    World.GENERATE_PROFILER.startTask("Meshing chunks");
     for (let y = 0; y < World.SIZE[1]; y++) {
       let line = [];
       
@@ -30,6 +38,7 @@ class World {
 
       chunks.push(line);
     }
+    World.GENERATE_PROFILER.endTask("Meshing chunks");
 
     return chunks;
   }
@@ -65,6 +74,8 @@ class World {
   }
 
   constructor({ chunkTypesSettings, perlinNoiseStep, perlinNoiseTimes, seed, worldXSize, worldYSize }) {
+    World.GENERATE_PROFILER = DebugHelper.createProfiler();
+
     if (worldXSize)
       World.SIZE[0] = worldXSize;
 
@@ -75,6 +86,28 @@ class World {
     this.entities = World.generateEntities(this, seed);
 
     this._seed = seed;
+
+
+    // DEBUG
+    if (UIManagerInstance.getElement("DebugMenu").hasElement("ProfilerDataContainer")) {
+      UIManagerInstance.getElement("DebugMenu").removeElement("ProfilerDataContainer")
+    }
+
+    UIManagerInstance.getElement("DebugMenu").addElement(`ProfilerDataContainer`, new UIContainer({
+      manager: UIManagerInstance,
+      pos: [0, 0],
+      isActive: true,
+      isRender: true,
+      name: "Profiler"
+    }))
+
+    World.GENERATE_PROFILER.getTasks().forEach((task, id) => {
+      UIManagerInstance.getElement("DebugMenu").getElement("ProfilerDataContainer").addElement(`DataLabel${id}`, new UILabel({
+        manager: UIManagerInstance,
+        isRender: true,
+        text: `[${DebugHelper.getDate()}] ${task.name}: ${task.time}ms`
+      }))
+    })
   }
 
   render() {

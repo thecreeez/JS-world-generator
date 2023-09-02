@@ -32,5 +32,5 @@ Application.EventBus.subscribe(EventBus.TYPES.RENDER_FRAME_END, () => {
     Application.Profilers.FPS_PROFILER.clear();
   }
 
-  Application.World = new World({ offset: [Application.World.offset[0] + 1, Application.World.offset[1] + 1], seed: Application.World._seed })
+  //Application.World = new World({ offset: [Application.World.offset[0] + 1, Application.World.offset[1] + 1], seed: Application.World._seed })
 })

@@ -1,6 +1,6 @@
 class World {
 
-  static DefaultSize = [150, 100]
+  static DefaultSize = [1500, 1000]
 
   static Biomes = {
     OCEAN: {
@@ -97,6 +97,8 @@ class World {
     this._seed = seed;
     this.offset = offset;
 
+    this._mesh = null;
+
     Application.EventBus.invoke(EventBus.TYPES.GENERATING_WORLD_START);
 
     Application.Profilers.WORLD_GENERATION_PROFILER.startTask("preparing");
@@ -110,6 +112,10 @@ class World {
     Application.Profilers.WORLD_GENERATION_PROFILER.startTask("generating chunks");
     this._generateHeights(offset);
     Application.Profilers.WORLD_GENERATION_PROFILER.endTask("generating chunks");
+
+    Application.Profilers.WORLD_GENERATION_PROFILER.startTask("generating mesh");
+    this._generateMesh();
+    Application.Profilers.WORLD_GENERATION_PROFILER.endTask("generating mesh");
 
     Application.EventBus.invoke(EventBus.TYPES.GENERATING_WORLD_END);
   }
@@ -167,6 +173,40 @@ class World {
         }
       }
     }
+  }
+
+  _generateMesh() {
+    this._createRenderQueue();
+    let chunkSize = this.getChunkSize();
+    let heightValue = chunkSize / 2;
+
+    this._cache = document.createElement("canvas");
+    this._cache.width = chunkSize * this._size[0];
+    this._cache.height = chunkSize * this._size[1];
+
+    let ctx = this._cache.getContext("2d");
+
+    this._renderQueue.forEach((chunkRender) => {
+      let x = chunkRender.pos[0];
+      let y = chunkRender.pos[1];
+      let chunk = chunkRender.chunk;
+
+      let renderData = {
+        pos: [x * chunkSize, y * chunkSize],
+        size: [chunkSize, chunkSize]
+      }
+
+      if (chunk.getHeight() > 0) {
+        renderData.pos[0] -= heightValue * chunk.getHeightWithBiomeHeight() / 2;
+        renderData.pos[1] -= heightValue * chunk.getHeightWithBiomeHeight() / 2;
+
+        renderData.size[0] += heightValue * chunk.getHeightWithBiomeHeight();
+        renderData.size[1] += heightValue * chunk.getHeightWithBiomeHeight();
+      }
+
+      ctx.fillStyle = chunk.getColor();
+      ctx.fillRect(renderData.pos[0], renderData.pos[1], renderData.size[0], renderData.size[1]);
+    })
   }
 
   _createRenderQueue() {
@@ -232,34 +272,11 @@ class World {
   }
 
   render() {
-    let chunkSize = this.getChunkSize();
-    let heightValue = chunkSize / 2;
-
-    if (!this._renderQueue) {
-      this._createRenderQueue();
+    if (!this._cache || this._needToRebuildCache) {
+      this._generateMesh();
     }
 
-    this._renderQueue.forEach((chunkRender) => {
-      let x = chunkRender.pos[0];
-      let y = chunkRender.pos[1];
-      let chunk = chunkRender.chunk;
-
-      let renderData = {
-        pos: [x * chunkSize, y * chunkSize],
-        size: [chunkSize, chunkSize]
-      }
-
-      if (chunk.getHeight() > 0) {
-        renderData.pos[0] -= heightValue * chunk.getHeightWithBiomeHeight() / 2;
-        renderData.pos[1] -= heightValue * chunk.getHeightWithBiomeHeight() / 2;
-
-        renderData.size[0] += heightValue * chunk.getHeightWithBiomeHeight();
-        renderData.size[1] += heightValue * chunk.getHeightWithBiomeHeight();
-      }
-
-      ctx.fillStyle = chunk.getColor();
-      ctx.fillRect(renderData.pos[0], renderData.pos[1], renderData.size[0], renderData.size[1]);
-    })
+    ctx.drawImage(this._cache, 0, 0);
   }
 
   update() {

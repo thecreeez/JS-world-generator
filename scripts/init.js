@@ -8,6 +8,6 @@ window.onload = () => {
   Application.start({
     debug: true,
     ticksPerSecond: 60,
-    fpsMax: 2
+    fpsMax: 144
   });
 }

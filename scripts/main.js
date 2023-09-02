@@ -5,6 +5,8 @@ const ctx = canvas.getContext("2d");
 
 let WORLD;
 
+let FPS_PROFILER = DebugHelper.createProfiler();
+
 function start() {
   
 }
@@ -20,7 +22,9 @@ async function renderAsync() {
   if (WORLD)
     WORLD.render();
 
+  FPS_PROFILER.startTask("[UI] Render")
   UIManagerInstance.render();
+  FPS_PROFILER.endTask("[UI] Render")
   DebugHelper.render();
 }
 

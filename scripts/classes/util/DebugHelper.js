@@ -11,6 +11,31 @@ class DebugHelper {
 
   static render() {
     DebugHelper._FPS_ON_THIS_SECOND++;
+
+    /**
+     * TO-DO: MAKE EVENTBUS AND MOVE THIS SOMEWHERE....
+     */
+    if (UIManagerInstance.getElement("DebugMenu").hasElement("ProfilerDataFPSContainer")) {
+      UIManagerInstance.getElement("DebugMenu").removeElement("ProfilerDataFPSContainer")
+    }
+
+    UIManagerInstance.getElement("DebugMenu").addElement(`ProfilerDataFPSContainer`, new UIContainer({
+      manager: UIManagerInstance,
+      pos: [0, 0],
+      isActive: true,
+      isRender: true,
+      name: "Frame Profiler"
+    }))
+
+    FPS_PROFILER.getTasks().forEach((task, id) => {
+      UIManagerInstance.getElement("DebugMenu").getElement("ProfilerDataFPSContainer").addElement(`DataLabel${id}`, new UILabel({
+        manager: UIManagerInstance,
+        isRender: true,
+        text: `[${DebugHelper.getDate()}] ${task.name}: ${task.time}ms`
+      }))
+    })
+
+    FPS_PROFILER.clear();
   }
 
   static count() {

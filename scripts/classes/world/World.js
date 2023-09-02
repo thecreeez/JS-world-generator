@@ -28,10 +28,11 @@ class World {
       
       for (let x = 0; x < World.SIZE[0]; x++) {
         let chunkType = World.getChunkByChunkTypesSettingsAndHeight({ chunkTypesSettings, height: heightNoise[y][x] });
-        line.push(new Chunk({ 
-          red: chunkType.rgb[0] - heightNoise[y][x] * 5, 
-          green: chunkType.rgb[1] - heightNoise[y][x] * 5, 
-          blue: chunkType.rgb[2] - heightNoise[y][x] * 5, 
+
+        line.push(new Chunk({
+          red: chunkType.rgb[0] - heightNoise[y][x] * 5,
+          green: chunkType.rgb[1] - heightNoise[y][x] * 5,
+          blue: chunkType.rgb[2] - heightNoise[y][x] * 5,
           alpha: (alphaNoise[y][x] + 1) / 2
         }))
       }
@@ -88,7 +89,9 @@ class World {
     this._seed = seed;
 
 
-    // DEBUG
+    /**
+     * TO-DO: MAKE EVENTBUS AND MOVE THIS SOMEWHERE....
+     */
     if (UIManagerInstance.getElement("DebugMenu").hasElement("ProfilerDataContainer")) {
       UIManagerInstance.getElement("DebugMenu").removeElement("ProfilerDataContainer")
     }
@@ -98,7 +101,7 @@ class World {
       pos: [0, 0],
       isActive: true,
       isRender: true,
-      name: "Profiler"
+      name: "Generation Profiler"
     }))
 
     World.GENERATE_PROFILER.getTasks().forEach((task, id) => {
@@ -113,16 +116,20 @@ class World {
   render() {
     let chunkSize = World.getChunkSize();
 
+    FPS_PROFILER.startTask("[WORLD] Chunk drawing")
     this.chunks.forEach((chunkLine, y) => {
       chunkLine.forEach((chunk, x) => {
         ctx.fillStyle = chunk.getColor();
         ctx.fillRect(x * chunkSize, y * chunkSize, chunkSize, chunkSize);
       })
     })
+    FPS_PROFILER.endTask("[WORLD] Chunk drawing")
 
+    FPS_PROFILER.startTask("[WORLD] Entity drawing")
     this.entities.forEach((entity) => {
       entity.render();
     })
+    FPS_PROFILER.endTask("[WORLD] Entity drawing")
   }
 
   update() {

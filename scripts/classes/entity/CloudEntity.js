@@ -13,7 +13,13 @@ class CloudEntity extends Entity {
       this._isHigher = true;
     }
 
-    this._noise = PerlinNoiseGenerator.noise(MathHelper.randomInt(1, 2, Math.random), MathHelper.randomInt(1,2,Math.random), 10, 0.05, seed);
+    this._noise = PerlinNoiseGenerator.noise({
+      xSize: MathHelper.randomInt(1, 2, Math.random), 
+      ySize: MathHelper.randomInt(1,2,Math.random), 
+      times: 10, 
+      step: 0.05, 
+      seed: seed
+    });
   }
 
   render() {

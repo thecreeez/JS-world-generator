@@ -7,6 +7,7 @@ class DebugHelper {
 
   static update() {
     DebugHelper._UPS_ON_THIS_SECOND++;
+    offsetX += 1 * World.TICK_SPEED;
   }
 
   static render() {

@@ -292,7 +292,7 @@ class UIStorage {
       }))
 
       container.getElement(`${chunkType.type}Slider`).onchange = (elem, value) => {
-        elem.getManager().getElement("MainMenu").getElement("ButtonTest").emulateClick();
+        elem.getManager().getElement("MainMenu").getElement("ButtonGenerate").emulateClick();
       }
     })
 

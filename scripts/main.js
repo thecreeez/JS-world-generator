@@ -7,6 +7,8 @@ let WORLD;
 
 let FPS_PROFILER = DebugHelper.createProfiler();
 
+let offsetX = 0;
+
 function start() {
   
 }

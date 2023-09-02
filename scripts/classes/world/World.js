@@ -15,11 +15,24 @@ class World {
     let chunks = [];
 
     World.GENERATE_PROFILER.startTask("Height noise");
-    let heightNoise = PerlinNoiseGenerator.noise(World.SIZE[0], World.SIZE[1], perlinNoiseTimes, perlinNoiseStep, seed );
+    let heightNoise = PerlinNoiseGenerator.noise({
+      xSize: World.SIZE[0], 
+      ySize: World.SIZE[1], 
+      times: perlinNoiseTimes, 
+      step: perlinNoiseStep, 
+      seed: seed
+    });
     World.GENERATE_PROFILER.endTask("Height noise");
 
     World.GENERATE_PROFILER.startTask("Alpha noise");
-    let alphaNoise = PerlinNoiseGenerator.noise(World.SIZE[0], World.SIZE[1], perlinNoiseTimes, perlinNoiseStep, seed + 25 );
+    let alphaNoise = PerlinNoiseGenerator.noise({
+      xSize: World.SIZE[0],
+      ySize: World.SIZE[1],
+      times: perlinNoiseTimes,
+      step: perlinNoiseStep,
+      seed: seed + 25,
+      offset: [offsetX,0]
+    });
     World.GENERATE_PROFILER.endTask("Alpha noise");
 
     World.GENERATE_PROFILER.startTask("Meshing chunks");
@@ -84,7 +97,7 @@ class World {
       World.SIZE[1] = worldYSize
 
     this.chunks = World.generateChunks({ chunkTypesSettings, perlinNoiseStep, perlinNoiseTimes, seed });
-    this.entities = World.generateEntities(this, seed);
+    this.entities = []//World.generateEntities(this, seed);
 
     this._seed = seed;
 
@@ -130,6 +143,8 @@ class World {
       entity.render();
     })
     FPS_PROFILER.endTask("[WORLD] Entity drawing")
+
+    UIManagerInstance.getElement("MainMenu").getElement("ButtonGenerate").emulateClick();
   }
 
   update() {
@@ -140,6 +155,7 @@ class World {
     this.entities = this.entities.filter((entity) => !entity.needToRemove);
 
     if (this.entities.length < World.ENTITIES_MAX) {
+      return;
       this.entities.push(new CloudEntity({
         world: this,
         pos: [World.getChunkSize() * World.SIZE[0] + Math.random() * (World.SIZE[0] * 5), Math.random() * canvas.height],

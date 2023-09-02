@@ -1,6 +1,6 @@
 class PerlinNoiseGenerator {
-  static noise(xSize, ySize, times, step, seed) {
-    let noiseArr = PerlinNoiseGenerator._noise(xSize, ySize, seed);
+  static noise({xSize, ySize, times, step, seed, offset = [0,0]}) {
+    let noiseArr = PerlinNoiseGenerator._noise({xSize, ySize, seed, offset});
 
     for (let i = 0; i < times; i++) {
       PerlinNoiseGenerator._interpolate(noiseArr, step);
@@ -24,13 +24,13 @@ class PerlinNoiseGenerator {
     return out;
   }
 
-  static _noise(xSize, ySize, seed) {
+  static _noise({xSize, ySize, seed, offset}) {
     let noiseArr = [];
 
-    for (let y = 0; y < ySize; y++) {
+    for (let y = offset[1]; y < ySize + offset[1]; y++) {
       let noiseLine = [];
 
-      for (let x = 0; x < xSize; x++) {
+      for (let x = offset[0]; x < xSize + offset[0]; x++) {
         let random = MathHelper.createRandom(seed * x * y);
         // -1 или 1
         let randomNum = MathHelper.randomInt(0, 1, random) * 2 - 1;

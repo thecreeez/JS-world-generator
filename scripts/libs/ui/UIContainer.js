@@ -76,6 +76,10 @@ class UIContainer extends UIElement {
     return this._elements.delete(id);
   }
 
+  clearElements() {
+    return this._elements.clear();
+  }
+
   render({ ctx, pos }) {
     super.render();
 

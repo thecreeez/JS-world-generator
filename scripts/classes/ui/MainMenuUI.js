@@ -1,26 +1,21 @@
-class UIStorage {
-  /**
-   * 
-   * @param {UIManager} manager 
-   * @returns 
-   */
-  static MAIN_UI(manager) {
+class MainMenuUI {
+  static create(pos = [0,0]) {
     let container = new UIContainer({
-      manager,
-      pos: [0, 0],
+      manager: Application.UIManager,
+      pos,
       isActive: true,
       isRender: true,
       name: "Настройка"
     })
 
     container.addElement("PerlinNoiseStepSliderLabel", new UILabel({
-      manager,
+      manager: Application.UIManager,
       isRender: true,
       text: "Сглаживание шума перлина"
     }))
 
     container.addElement("PerlinNoiseStepSlider", new UISlider({
-      manager,
+      manager: Application.UIManager,
       isActive: true,
       isRender: true,
       min: 0.001,
@@ -33,13 +28,13 @@ class UIStorage {
     }
 
     container.addElement("PerlinNoiseIterationsSliderLabel", new UILabel({
-      manager,
+      manager: Application.UIManager,
       isRender: true,
       text: "Кол-во итераций сглаживания"
     }))
 
     container.addElement("PerlinNoiseIterationsSlider", new UISlider({
-      manager,
+      manager: Application.UIManager,
       isActive: true,
       isRender: true,
       min: 1,
@@ -53,19 +48,19 @@ class UIStorage {
     }
 
     container.addElement("PerlinNoiseSeedSpaceTop", new UILabel({
-      manager,
+      manager: Application.UIManager,
       isRender: true,
       text: ""
     }))
 
     container.addElement("PerlinNoiseSeedLabel", new UILabel({
-      manager,
+      manager: Application.UIManager,
       isRender: true,
       text: "Рандом"
     }))
 
     container.addElement("ButtonSwitchRandomType", new UIButton({
-      manager,
+      manager: Application.UIManager,
       text: `Тип: ${World.method}`,
       isActive: true,
       isRender: true,
@@ -93,7 +88,7 @@ class UIStorage {
     }))
 
     container.addElement("PerlinNoiseSeedTextInput", new UITextInput({
-      manager,
+      manager: Application.UIManager,
       isActive: true,
       isRender: true,
       whiteList: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
@@ -103,7 +98,7 @@ class UIStorage {
     }))
 
     container.addElement("ButtonSeedRandom", new UIButton({
-      manager,
+      manager: Application.UIManager,
       text: "Рандомный сид",
       isActive: true,
       isRender: true,
@@ -117,19 +112,19 @@ class UIStorage {
     }))
 
     container.addElement("PerlinNoiseSeedSpaceBottom", new UILabel({
-      manager,
+      manager: Application.UIManager,
       isRender: true,
       text: ""
     }))
 
     container.addElement("WorldLabel", new UILabel({
-      manager,
+      manager: Application.UIManager,
       isRender: true,
       text: "Мир"
     }))
 
     container.addElement("ButtonEntityIsOn", new UIButton({
-      manager,
+      manager: Application.UIManager,
       text: "Настройки чанков",
       isActive: true,
       isRender: true,
@@ -147,13 +142,13 @@ class UIStorage {
     }))
 
     container.addElement("WorldSizeXLabel", new UILabel({
-      manager,
+      manager: Application.UIManager,
       isRender: true,
       text: "Размер X"
     }))
 
     container.addElement("WorldSizeXSlider", new UISlider({
-      manager,
+      manager: Application.UIManager,
       isActive: true,
       isRender: true,
       min: 1,
@@ -167,13 +162,13 @@ class UIStorage {
     }
 
     container.addElement("WorldSizeYLabel", new UILabel({
-      manager,
+      manager: Application.UIManager,
       isRender: true,
       text: "Размер Y"
     }))
 
     container.addElement("WorldSizeYSlider", new UISlider({
-      manager,
+      manager: Application.UIManager,
       isActive: true,
       isRender: true,
       min: 1,
@@ -187,13 +182,13 @@ class UIStorage {
     }
 
     container.addElement("WorldSpeedLabel", new UILabel({
-      manager,
+      manager: Application.UIManager,
       isRender: true,
       text: "Скорость мира"
     }))
 
     container.addElement("WorldSpeedSlider", new UISlider({
-      manager,
+      manager: Application.UIManager,
       isActive: true,
       isRender: true,
       min: 0.1,
@@ -206,13 +201,13 @@ class UIStorage {
     }
 
     container.addElement("WorldSpaceBottom", new UILabel({
-      manager,
+      manager: Application.UIManager,
       isRender: true,
       text: ""
     }))
 
     container.addElement("ButtonGenerate", new UIButton({
-      manager,
+      manager: Application.UIManager,
       text: "Генерация",
       isActive: true,
       isRender: true,
@@ -229,7 +224,7 @@ class UIStorage {
 
         let generationData = {
           chunkTypesSettings: {},
-          perlinNoiseStep: noiseStep.getValue(), 
+          perlinNoiseStep: noiseStep.getValue(),
           perlinNoiseTimes: noiseIterations.getValue(),
           seed: noiseSeed.getValue(),
           worldXSize: worldXSize.getValue(),
@@ -259,67 +254,8 @@ class UIStorage {
           })
         }
 
-        WORLD = new World(generationData); 
+        WORLD = new World(generationData);
       }
-    }))
-
-    return container;
-  }
-
-  static CHUNKS_SETTINGS(manager) {
-    let container = new UIContainer({
-      manager,
-      pos: [0, 0],
-      isActive: true,
-      isRender: true,
-      name: "Chunks Settings"
-    })
-
-    ChunkStorage.getAll().forEach((chunkType) => {
-      container.addElement(`${chunkType.type}Label`, new UILabel({
-        manager,
-        isRender:true,
-        text: `Высота чанка ${chunkType.type}`
-      }))
-
-      container.addElement(`${chunkType.type}Slider`, new UISlider({
-        manager,
-        isActive: true,
-        isRender: true,
-        min: -1,
-        max: 1,
-        value: chunkType.defaultHeight
-      }))
-
-      container.getElement(`${chunkType.type}Slider`).onchange = (elem, value) => {
-        elem.getManager().getElement("MainMenu").getElement("ButtonGenerate").emulateClick();
-      }
-    })
-
-    return container;
-  }
-
-  static DEBUG_MENU(manager) {
-    let container = new UIContainer({
-      manager,
-      pos: [0,0],
-      isActive: true,
-      isRender: true,
-      name: "Debug"
-    })
-
-    container.addElement(`UpsAndFpsLabel`, new UILabel({
-      manager,
-      isRender: true,
-      text: `FPS: 0 UPS: 0`
-    }))
-
-    container.addElement(`ProfilerDataContainer`, new UIContainer({
-      manager,
-      pos: [0,0],
-      isActive: true,
-      isRender: true,
-      name: "Profiler"
     }))
 
     return container;

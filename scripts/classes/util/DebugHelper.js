@@ -5,38 +5,14 @@ class DebugHelper {
   static UPS = 0;
   static _UPS_ON_THIS_SECOND = 0;
 
+  static DEBUG_HELPER_MENU_ID = "DebugMenu";
+
   static update() {
     DebugHelper._UPS_ON_THIS_SECOND++;
-    offsetX += 1 * World.TICK_SPEED;
   }
 
   static render() {
     DebugHelper._FPS_ON_THIS_SECOND++;
-
-    /**
-     * TO-DO: MAKE EVENTBUS AND MOVE THIS SOMEWHERE....
-     */
-    if (UIManagerInstance.getElement("DebugMenu").hasElement("ProfilerDataFPSContainer")) {
-      UIManagerInstance.getElement("DebugMenu").removeElement("ProfilerDataFPSContainer")
-    }
-
-    UIManagerInstance.getElement("DebugMenu").addElement(`ProfilerDataFPSContainer`, new UIContainer({
-      manager: UIManagerInstance,
-      pos: [0, 0],
-      isActive: true,
-      isRender: true,
-      name: "Frame Profiler"
-    }))
-
-    FPS_PROFILER.getTasks().forEach((task, id) => {
-      UIManagerInstance.getElement("DebugMenu").getElement("ProfilerDataFPSContainer").addElement(`DataLabel${id}`, new UILabel({
-        manager: UIManagerInstance,
-        isRender: true,
-        text: `[${DebugHelper.getDate()}] ${task.name}: ${task.time}ms`
-      }))
-    })
-
-    FPS_PROFILER.clear();
   }
 
   static count() {
@@ -46,7 +22,9 @@ class DebugHelper {
     DebugHelper.UPS = DebugHelper._UPS_ON_THIS_SECOND;
     DebugHelper._UPS_ON_THIS_SECOND = 0;
 
-    UIManagerInstance.getElement("DebugMenu").getElement("UpsAndFpsLabel").setValue(`FPS: ${DebugHelper.FPS} UPS: ${DebugHelper.UPS}`)
+    if (Application.DEBUG_MODE) {
+      Application.UIManager.getElement("DebugMenu").getElement("UpsAndFpsLabel").setValue(`FPS: ${DebugHelper.FPS} UPS: ${DebugHelper.UPS}`)
+    }
   }
 
   static createProfiler() {

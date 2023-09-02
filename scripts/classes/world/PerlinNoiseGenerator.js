@@ -1,10 +1,11 @@
 class PerlinNoiseGenerator {
-  static noise({xSize, ySize, times, step, seed, offset = [0,0]}) {
-    let noiseArr = PerlinNoiseGenerator._noise({xSize, ySize, seed, offset});
+  static noise({size = [2,2], times, step, seed, offset = [0,0]}) {
+    let noiseArr = PerlinNoiseGenerator._noise({ xSize: size[0], ySize: size[1], seed, offset});
 
     for (let i = 0; i < times; i++) {
       PerlinNoiseGenerator._interpolate(noiseArr, step);
     }
+
     return noiseArr;
   }
 
@@ -15,7 +16,7 @@ class PerlinNoiseGenerator {
       let noiseLine = [];
 
       for (let x = 0; x < noise1[y].length; x++) {
-        noiseLine.push(MathHelper.interpolate(noise1[y][x], noise2[y][x], 0.5));
+        noiseLine.push(MathHelper.interpolate(noise1[y][x], noise2[y][x], 0.3));
       }
 
       out.push(noiseLine);

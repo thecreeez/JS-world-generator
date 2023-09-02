@@ -8,7 +8,7 @@ class MathHelper {
   }
 
   static createRandom(s) {
-    if (World.method == World.METHODS.FULL_RANDOM)
+    if (Application.RandomMethod == Application.RandomTypes.FullRandom)
       return Math.random
 
     var mask = 0xffffffff;
@@ -23,5 +23,9 @@ class MathHelper {
       result /= 4294967296;
       return result;
     }
+  }
+
+  static randomSeed() {
+    return Math.floor(Math.random() * Math.random() * 1000000)
   }
 }

@@ -46,12 +46,12 @@ class PerlinNoiseGenerator {
   }
 
   static _interpolate(arr, step) {
-    for (let y = 1; y < arr.length - 1; y++) {
-      for (let x = 1; x < arr[y].length - 1; x++) {
-        let prevTop = arr[y - 1][x];
-        let prevLeft = arr[y][x - 1];
-        let nextBot = arr[y + 1][x];
-        let nextRight = arr[y][x + 1]
+    for (let y = 0; y < arr.length; y++) {
+      for (let x = 0; x < arr[y].length; x++) {
+        let prevTop = arr[y - 1] ? arr[y - 1][x] : arr[y][x];
+        let prevLeft = arr[y][x - 1] ? arr[y][x - 1] : arr[y][x];
+        let nextBot = arr[y + 1] ? arr[y + 1][x] : arr[y][x];
+        let nextRight = arr[y][x + 1] ? arr[y][x + 1] : arr[y][x];
         
         arr[y][x] = MathHelper.interpolate(arr[y][x], prevTop, step);
         arr[y][x] = MathHelper.interpolate(arr[y][x], prevLeft, step);

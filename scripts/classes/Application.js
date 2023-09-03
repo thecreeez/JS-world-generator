@@ -5,14 +5,14 @@ class Application {
   static World;
   static DEBUG_MODE = false;
 
-  static CHUNK_GENERATION_PER_TICK = 3;
+  static CHUNK_GENERATION_PER_TICK = 5;
 
   static RandomTypes = {
     FullRandom: "Случайно",
     SeedRandom: "Псевдослучайно"
   }
 
-  static RandomMethod = Application.RandomTypes.SeedRandom;
+  static RandomMethod = Application.RandomTypes.FullRandom;
 
   static Profilers = {
     FPS_PROFILER: DebugHelper.createProfiler(),

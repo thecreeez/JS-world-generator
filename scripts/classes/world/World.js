@@ -1,7 +1,7 @@
 class World {
 
-  static DefaultSize = [1000, 1000]
-  static SliceSize = [50, 50]
+  static DefaultSize = [100, 100]
+  static SliceSize = [10, 10]
 
   static States = {
     INIT: "init",
@@ -303,6 +303,9 @@ class World {
     }
 
     this._chunks[y][x] = chunk;
+
+    if (this.getState() == World.States.IDLE)
+      WorldGenerator.bakeSlice(this, Math.floor(x / World.SliceSize[0]), Math.floor(y / World.SliceSize[1]))
   }
 
   getChunk(x, y) {
@@ -312,5 +315,18 @@ class World {
     }
 
     return this._chunks[y][x];
+  }
+
+  removeSlice(xSlice, ySlice) {
+    for (let y = 0; y < World.SliceSize[1]; y++) {
+      let globalY = ySlice * World.SliceSize[1] + y;
+      for (let x = 0; x < World.SliceSize[0]; x++) {
+        let globalX = xSlice * World.SliceSize[0] + x;
+
+        this.setChunk(globalX, globalY, new Chunk());
+      }
+    }
+
+    WorldGenerator.bakeSlice(this, xSlice, ySlice);
   }
 }

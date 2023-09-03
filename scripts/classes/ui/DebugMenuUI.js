@@ -16,11 +16,11 @@ class DebugMenuUI {
 
     container.addElement("MoveButton", new UIButton({
       manager: Application.UIManager,
-      text: "Направо",
+      text: "Очистить",
       isActive: true,
       isRender: true,
       onClick: (elem, pos) => {
-        
+        Application.World.removeSlice(2,2);
       }
     }))
 

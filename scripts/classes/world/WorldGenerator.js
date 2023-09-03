@@ -7,7 +7,7 @@ class WorldGenerator {
     world.WorldGeneratorCache.noises = {
       BIOME: PerlinNoiseGenerator.noise({
         size: world._size,
-        times: 40,
+        times: 20,
         step: 0.4,
         seed: world._seed * 2,
       }),
@@ -36,8 +36,8 @@ class WorldGenerator {
   }
 
   static _generateAndMeshChunk(world) {
-    WorldGenerator._generateChunk(world);
-    WorldGenerator._meshChunk(world);
+    WorldGenerator.generateSlice(world, world.WorldGeneratorCache.slice[0], world.WorldGeneratorCache.slice[1]);
+    WorldGenerator.bakeSlice(world, world.WorldGeneratorCache.slice[0], world.WorldGeneratorCache.slice[1]);
 
     world.WorldGeneratorCache.slice[0]++;
 
@@ -51,18 +51,22 @@ class WorldGenerator {
     }
   }
 
-  static _generateChunk(world) {
+  static generateSlice(world, x, y) {
+    if (!world.WorldGeneratorCache) {
+      console.error(`cant generate slice. WorldGeneratorCache isnt exist.`);
+      world.setState(World.States.INIT);
+    }
+
     let noises = world.WorldGeneratorCache.noises;
-    let slicePos = world.WorldGeneratorCache.slice;
 
     for (let localY = 0; localY < World.SliceSize[1]; localY++) {
-      let globalY = World.SliceSize[1] * slicePos[1] + localY;
+      let globalY = World.SliceSize[1] * y + localY;
       if (!world.getChunks()[globalY]) {
         world.getChunks()[globalY] = [];
       }
 
       for (let localX = 0; localX < World.SliceSize[0]; localX++) {
-        let globalX = World.SliceSize[0] * slicePos[0] + localX;
+        let globalX = World.SliceSize[0] * x + localX;
 
         let biome = world.getBiome(noises.BIOME[globalY][globalX]);
         let height = noises.CHUNKS[globalY][globalX];
@@ -77,9 +81,7 @@ class WorldGenerator {
     }
   }
 
-  static _meshChunk(world) {
-    let slicePos = world.WorldGeneratorCache.slice;
-
+  static bakeSlice(world, x, y) {
     if (!world._cache) {
       let chunkSize = world.getChunkSize();
 
@@ -91,13 +93,13 @@ class WorldGenerator {
     let ctx = world._cache.getContext("2d");
 
     for (let localY = 0; localY < World.SliceSize[1]; localY++) {
-      let globalY = World.SliceSize[1] * slicePos[1] + localY;
+      let globalY = World.SliceSize[1] * y + localY;
       if (!world.getChunks()[globalY]) {
         world.getChunks()[globalY] = [];
       }
 
       for (let localX = 0; localX < World.SliceSize[0]; localX++) {
-        let globalX = World.SliceSize[0] * slicePos[0] + localX;
+        let globalX = World.SliceSize[0] * x + localX;
 
         let chunk = world.getChunk(globalX, globalY);
 

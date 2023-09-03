@@ -9,9 +9,14 @@ class EventBus {
     RENDER_UI_END: "render_ui_end",
     RENDER_FRAME_END: "render_frame_end",
 
-    GENERATING_WORLD_START: "generating_world_start",
-    
-    GENERATING_WORLD_END: "generating_world_end",
+    UPDATE_START: "update_start",
+
+    UPDATE_CHUNK_GENERATE_START: "update_chunk_generate_start",
+    UPDATE_CHUNK_GENERATE_END: "update_chunk_generate_end",
+    UPDATE_CHUNK_BAKE_START: "update_chunk_bake_start",
+    UPDATE_CHUNK_BAKE_END: "update_chunk_bake_end",
+
+    UPDATE_END: "update_end",
 
     GENERATE_WORLD_REQUEST: "generate_world_request"
   }

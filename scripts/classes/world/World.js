@@ -1,6 +1,6 @@
 class World {
 
-  static DefaultSize = [100, 100]
+  static DefaultSize = [200, 200]
   static SliceSize = [10, 10]
 
   static States = {
@@ -10,12 +10,14 @@ class World {
     IDLE: "idle"
   }
 
+  // MOVE THIS OUT
+  // ALSO MAKE AUTO HEIGHT BY CREATING WEIGHT
   static Biomes = {
     OCEAN: {
       name: "ocean",
-      height: -0.1,
+      height: 0,
       rgb: [35, 119, 181],
-      chunks: {
+      blocks: {
         OCEAN_DEEP: {
           rgb: [15, 50, 70],
           height: 0,
@@ -36,11 +38,24 @@ class World {
       }
     },
 
+    BEACH: {
+      name: "beach",
+      height: 0.05,
+      rgb: [166, 166, 0],
+      blocks: {
+        BEACH: {
+          rgb: [166, 166, 0],
+          height: 1,
+          name: "beach"
+        }
+      }
+    },
+
     DEFAULT: {
       name: "Default",
-      height: 0.1,
+      height: 0.15,
       rgb: [67, 179, 2],
-      chunks: {
+      blocks: {
         GRASS: {
           rgb: [67, 179, 2], 
           height: 0.2, 
@@ -59,7 +74,7 @@ class World {
       name: "hills",
       height: 1,
       rgb: [194, 196, 194],
-      chunks: {
+      blocks: {
         GRASS: {
           rgb: [67, 179, 2],
           height: -0.4,
@@ -108,13 +123,14 @@ class World {
     this._state = World.States.INIT;
   }
 
+  // DEPRECATED
   _createRenderQueue() {
     this._renderQueue = [];
 
-    for (let y = 0; y < this._chunks.length; y++) {
-      for (let x = 0; x < this._chunks[y].length; x++) {
+    for (let y = 0; y < this._blocks.length; y++) {
+      for (let x = 0; x < this._blocks[y].length; x++) {
         this._renderQueue.push({
-          chunk: this._chunks[y][x],
+          chunk: this._blocks[y][x],
           pos: [x, y]
         });
       }
@@ -123,24 +139,24 @@ class World {
     this._renderQueue.sort((a, b) => a.chunk.getHeightWithBiomeHeight() - b.chunk.getHeightWithBiomeHeight());
   }
 
-  getChunkType(biome, height) {
-    let chunkType = this._getMaxHeightChunk(biome);
+  getBlockType(biome, height) {
+    let blockType = this._getMaxHeightBlock(biome);
 
-    for (let candidateChunkId in biome.chunks) {
-      if (height < biome.chunks[candidateChunkId].height && biome.chunks[candidateChunkId].height < chunkType.height) {
-        chunkType = biome.chunks[candidateChunkId]
+    for (let candidateBlockId in biome.blocks) {
+      if (height < biome.blocks[candidateBlockId].height && biome.blocks[candidateBlockId].height < blockType.height) {
+        blockType = biome.blocks[candidateBlockId]
       }
     }
 
-    return chunkType;
+    return blockType;
   }
 
-  _getMaxHeightChunk(biome) {
-    let max = biome.chunks[Object.keys(biome.chunks)[0]];
+  _getMaxHeightBlock(biome) {
+    let max = biome.blocks[Object.keys(biome.blocks)[0]];
 
-    Object.keys(biome.chunks).forEach((chunkName) => {
-      if (max.height < biome.chunks[chunkName].height) {
-        max = biome.chunks[chunkName]
+    Object.keys(biome.blocks).forEach((blockName) => {
+      if (max.height < biome.blocks[blockName].height) {
+        max = biome.blocks[blockName]
       }
     })
 
@@ -175,7 +191,23 @@ class World {
       return;
     }
 
+    this._cache.getContext("2d").drawImage(this._cache, this.test, 0);
     ctx.drawImage(this._cache, 0, 0);
+
+    this.test+=0.05;
+    /**
+     * 1) Движение камеры
+     * 2) Перемещение карты
+     * 3) Дорисовка чанков
+     */
+
+    //this.WorldGeneratorCache.noises.CHUNKS.forEach((noiseLine, y) => {
+    //  noiseLine.forEach((noiseValue, x) => {
+    //    let noiseValueToRGB = (noiseValue + 1) / 2 * 127.5;
+    //    ctx.fillStyle = `rgba(${noiseValueToRGB},${noiseValueToRGB},${noiseValueToRGB},0.6)`;
+    //    ctx.fillRect(x * chunkSize, y * chunkSize, chunkSize, chunkSize);
+    //  })
+    //})
   }
 
   update() {
@@ -186,7 +218,7 @@ class World {
     }
   }
 
-  getChunkSize() {
+  getBlockSize() {
     return canvas.height / this._size[1] < canvas.width / this._size[0] ? canvas.height / this._size[1] : canvas.width / this._size[0];
   }
 
@@ -197,11 +229,11 @@ class World {
     return this._state;
   }
 
-  getChunks() {
-    return this._chunks;
+  getBlocks() {
+    return this._blocks;
   }
 
-  setChunk(x, y, chunk) {
+  setBlock(x, y, block) {
     if (x < 0 || x > this._size[0]) {
       console.error(`x pos out of bounds.`)
       return;
@@ -212,28 +244,34 @@ class World {
       return;
     }
 
-    this._chunks[y][x] = chunk;
+    this._blocks[y][x] = block;
 
     if (this.getState() == World.States.IDLE)
       WorldGenerator.bakeSlice(this, Math.floor(x / World.SliceSize[0]), Math.floor(y / World.SliceSize[1]))
   }
 
-  getChunk(x, y) {
+  getBlock(x, y) {
     if (y < 0 || y > this._size[1]) {
       console.error(`y pos out of bounds.`)
       return;
     }
 
-    return this._chunks[y][x];
+    return this._blocks[y][x];
   }
 
-  removeSlice(xSlice, ySlice) {
+  invertSlice(xSlice, ySlice) {
     for (let y = 0; y < World.SliceSize[1]; y++) {
       let globalY = ySlice * World.SliceSize[1] + y;
       for (let x = 0; x < World.SliceSize[0]; x++) {
         let globalX = xSlice * World.SliceSize[0] + x;
 
-        this.setChunk(globalX, globalY, new Chunk());
+        let block = this.getBlock(globalX, globalY);
+
+        block.setColor([
+          255 - block._red,
+          255 - block._green,
+          255 - block._blue
+        ]);
       }
     }
 

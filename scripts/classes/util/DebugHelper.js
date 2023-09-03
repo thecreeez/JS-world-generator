@@ -47,6 +47,13 @@ class DebugHelper {
         })
       },
 
+      addCustomTask(name, time) {
+        this._doneTasks.push({
+          name: name,
+          time: time
+        })
+      },
+
       getTasks() {
         return this._doneTasks;
       },

@@ -1,5 +1,5 @@
-document.querySelector("canvas").width = 1280;
-document.querySelector("canvas").height = 800;
+document.querySelector("canvas").width = document.body.clientWidth;
+document.querySelector("canvas").height = document.body.clientHeight;
 
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
@@ -7,7 +7,7 @@ const ctx = canvas.getContext("2d");
 window.onload = () => {
   Application.start({
     debug: true,
-    ticksPerSecond: 60,
+    ticksPerSecond: 1000,
     fpsMax: 144
   });
 }

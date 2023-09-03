@@ -5,7 +5,7 @@ class Application {
   static World;
   static DEBUG_MODE = false;
 
-  static CHUNK_GENERATION_PER_TICK = 5;
+  static CHUNK_GENERATION_PER_TICK = 1;
 
   static RandomTypes = {
     FullRandom: "Случайно",
@@ -29,7 +29,7 @@ class Application {
     })
 
     if (Application.DEBUG_MODE) {
-      Application.UIManager.addElement(DebugHelper.DEBUG_HELPER_MENU_ID, DebugMenuUI.create([World.getBoundsOnScreen()[0], 0]));
+      Application.UIManager.addElement(DebugHelper.DEBUG_HELPER_MENU_ID, DebugMenuUI.create([0/*World.getBoundsOnScreen()[0]*/, 0]));
     }
 
     Application.World = new World({

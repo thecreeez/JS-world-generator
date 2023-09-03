@@ -20,7 +20,12 @@ class DebugMenuUI {
       isActive: true,
       isRender: true,
       onClick: (elem, pos) => {
-        Application.World.removeSlice(2,2);
+        Application.World.invertSlice(2,2);
+
+        //setTimeout(() => {
+        //  WorldGenerator.generateSlice(Application.World, 2, 2);
+        //  WorldGenerator.bakeSlice(Application.World, 2, 2);
+        //}, 1000)
       }
     }))
 

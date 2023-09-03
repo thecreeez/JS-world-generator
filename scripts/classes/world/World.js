@@ -108,95 +108,6 @@ class World {
     this._state = World.States.INIT;
   }
 
-  _prepareToGenerateChunks() {
-    this._chunks = [];
-
-    for (let y = 0; y < this._size[1]; y++) {
-      let chunkLine = [];
-
-      for (let x = 0; x < this._size[0]; x++) {
-        chunkLine.push(new Chunk({
-          red: 0,
-          green: 0,
-          blue: 0,
-          tags: [Chunk.Tags.NeedToGenerate]
-        }))
-      }
-
-      this._chunks.push(chunkLine);
-    }
-  }
-
-  _generateBiomes(offset) {
-    let biomeNoise = PerlinNoiseGenerator.noise({
-      size: [this._size[0] + 20, this._size[1] + 20],
-      times: 40,
-      step: 0.4,
-      seed: this._seed * 2,
-      offset
-    })
-
-    for (let y = 0; y < this._size[1]; y++) {
-      for (let x = 0; x < this._size[0]; x++) {
-        this._chunks[y][x].setBiome(this._getBiome(biomeNoise[y][x]))
-      }
-    }
-  }
-
-  _generateHeights(offset) {
-    let heightNoise = PerlinNoiseGenerator.noise({
-      size: this._size,
-      times: 6,
-      step: 0.1,
-      seed: this._seed * 5,
-      offset
-    })
-
-    for (let y = 0; y < this._size[1]; y++) {
-      for (let x = 0; x < this._size[0]; x++) {
-        if (this._chunks[y][x].hasTag(Chunk.Tags.NeedToGenerate)) {
-          this._chunks[y][x].setHeight(heightNoise[y][x]);
-          this._chunks[y][x].setColor(this._getChunkType(this._chunks[y][x]).rgb)
-          this._chunks[y][x].removeTag(Chunk.Tags.NeedToGenerate);
-        }
-      }
-    }
-  }
-
-  _generateMesh() {
-    this._createRenderQueue();
-    let chunkSize = this.getChunkSize();
-    let heightValue = chunkSize / 2;
-
-    this._cache = document.createElement("canvas");
-    this._cache.width = chunkSize * this._size[0];
-    this._cache.height = chunkSize * this._size[1];
-
-    let ctx = this._cache.getContext("2d");
-
-    this._renderQueue.forEach((chunkRender) => {
-      let x = chunkRender.pos[0];
-      let y = chunkRender.pos[1];
-      let chunk = chunkRender.chunk;
-
-      let renderData = {
-        pos: [x * chunkSize, y * chunkSize],
-        size: [chunkSize, chunkSize]
-      }
-
-      if (chunk.getHeight() > 0) {
-        renderData.pos[0] -= heightValue * chunk.getHeightWithBiomeHeight() / 2;
-        renderData.pos[1] -= heightValue * chunk.getHeightWithBiomeHeight() / 2;
-
-        renderData.size[0] += heightValue * chunk.getHeightWithBiomeHeight();
-        renderData.size[1] += heightValue * chunk.getHeightWithBiomeHeight();
-      }
-
-      ctx.fillStyle = chunk.getColor();
-      ctx.fillRect(renderData.pos[0], renderData.pos[1], renderData.size[0], renderData.size[1]);
-    })
-  }
-
   _createRenderQueue() {
     this._renderQueue = [];
 
@@ -260,9 +171,8 @@ class World {
   }
 
   render() {
-    if (!this._cache || this._needToRebuildCache) {
+    if (!this._cache) {
       return;
-      this._generateMesh();
     }
 
     ctx.drawImage(this._cache, 0, 0);

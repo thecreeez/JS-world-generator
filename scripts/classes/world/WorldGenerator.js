@@ -22,7 +22,7 @@ class WorldGenerator {
     
   }
 
-  static generateChunk(world, x, y, {leftChunk, rightChunk}) {
+  static generateChunk(world, x, y, {leftChunk, rightChunk, topChunk, bottomChunk}) {
     let biomeNoise = PerlinNoiseGenerator.noise({
       size: World.ChunkSize,
       times: WorldGenerator.BIOME_NOISE_TIMES,
@@ -37,16 +37,19 @@ class WorldGenerator {
       seed: world.getSeed() * x * y * 30
     })
 
+    let biomeStep = 0.6;
+    let heightStep = 0.3
+
     if (rightChunk) {
       biomeNoise = PerlinNoiseGenerator.smoothNoise({
         noise: biomeNoise,
         rightNoise: rightChunk.biome,
-        step: 0.65
+        step: biomeStep
       })
       heightNoise = PerlinNoiseGenerator.smoothNoise({
         noise: heightNoise,
         rightNoise: rightChunk.height,
-        step: 0.3
+        step: heightStep
       })
     }
 
@@ -54,16 +57,40 @@ class WorldGenerator {
       biomeNoise = PerlinNoiseGenerator.smoothNoise({
         noise: biomeNoise,
         leftNoise: leftChunk.biome,
-        step: 0.65
+        step: biomeStep
       })
       heightNoise = PerlinNoiseGenerator.smoothNoise({
         noise: heightNoise,
         leftNoise: leftChunk.height,
-        step: 0.3
+        step: heightStep
       })
     }
 
-    
+    if (topChunk) {
+      biomeNoise = PerlinNoiseGenerator.smoothNoise({
+        noise: biomeNoise,
+        topNoise: topChunk.biome,
+        step: biomeStep
+      })
+      heightNoise = PerlinNoiseGenerator.smoothNoise({
+        noise: heightNoise,
+        topNoise: topChunk.height,
+        step: heightStep
+      })
+    }
+
+    if (bottomChunk) {
+      biomeNoise = PerlinNoiseGenerator.smoothNoise({
+        noise: biomeNoise,
+        bottomNoise: bottomChunk.biome,
+        step: biomeStep
+      })
+      heightNoise = PerlinNoiseGenerator.smoothNoise({
+        noise: heightNoise,
+        bottomNoise: bottomChunk.height,
+        step: heightStep
+      })
+    }
 
     let chunk = new Chunk(x, y, { biome: biomeNoise, height: heightNoise })
 
@@ -81,7 +108,7 @@ class WorldGenerator {
 
         chunk.setBlock(chunkX, chunkY, new Block({ blockType, biome: biome}))
 
-        //chunk.setBlock(chunkX, chunkY, new Block({ red: heightNoise[chunkY][chunkX] * 255, green: heightNoise[chunkY][chunkX] * 255, blue: heightNoise[chunkY][chunkX] * 255 }))
+        //chunk.setBlock(chunkX, chunkY, new Block({ red: biomeNoise[chunkY][chunkX] * 255, green: biomeNoise[chunkY][chunkX] * 255, blue: biomeNoise[chunkY][chunkX] * 255 }))
       }
     }
 

@@ -19,12 +19,13 @@ window.onload = () => {
 
   let world = new World();
 
-  //let topChunk = WorldGenerator.generateChunk(world, 0, 1);
-  //let bottomChunk = WorldGenerator.generateChunk(world, 0, -1);
   let leftChunk = WorldGenerator.generateChunk(world, -1, 0, {});
-  let rightChunk = WorldGenerator.generateChunk(world, 1, 0, {});
+  let chunk = WorldGenerator.generateChunk(world, 0, 0, { leftChunk });
+  let rightChunk = WorldGenerator.generateChunk(world, 1, 0, { leftChunk: chunk });
 
-  let chunk = WorldGenerator.generateChunk(world, 0, 0, { leftChunk, rightChunk });
+  //let topChunk = WorldGenerator.generateChunk(world, 0, 1, {});
+  //let bottomChunk = WorldGenerator.generateChunk(world, 0, -1, {});
+
 
   ctx.drawImage(chunk.getCanvas(), 250, 250, 250, 250)
   //ctx.drawImage(topChunk.getCanvas(), 250, 0, 250, 250)

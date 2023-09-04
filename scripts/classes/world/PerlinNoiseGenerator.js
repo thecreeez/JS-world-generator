@@ -10,8 +10,8 @@ class PerlinNoiseGenerator {
     return noiseArr;
   }
 
-  // TO-DO: MAKE SMOOTH BITCH
-  static smoothNoise({ noise, leftNoise = null, rightNoise = null, topNoise = null, bottomNoise = null, times, step}) {
+  // Сглаживает разницу между шумами (берет только самый крайний и сглаживает ровно blockSmooth значений)
+  static smoothNoise({ noise, leftNoise = null, rightNoise = null, topNoise = null, bottomNoise = null, blockSmooth = 3, step}) {
     if (!noise) {
       console.error(`noise is not presented.`)
       return noise;
@@ -24,24 +24,47 @@ class PerlinNoiseGenerator {
 
     if (leftNoise) {
       for (let y = 0; y < leftNoise.length; y++) {
-        let leftNoiseValue = leftNoise[y][leftNoise[y].length - 1];        
+        let leftNoiseValue = leftNoise[y][leftNoise[y].length - 1];
+
         noise[y][0] = MathHelper.interpolate(noise[y][0], leftNoiseValue, step);
+        for (let i = 1; i < blockSmooth; i++) {
+          noise[y][i] = MathHelper.interpolate(noise[y][i], noise[y][i - 1], step);
+        }
       }
     }
 
     if (rightNoise) {
       for (let y = 0; y < rightNoise.length; y++) {
         let rightNoiseValue = rightNoise[y][0];
+
         noise[y][noise[y].length - 1] = MathHelper.interpolate(noise[y][noise[y].length - 1], rightNoiseValue, step);
+        
+        for (let i = 1; i < blockSmooth; i++) {
+          noise[y][noise[y].length - 1 - i] = MathHelper.interpolate(noise[y][noise[y].length - 1 - i], noise[y][noise[y].length - i], step);
+        }
       }
     }
 
     if (topNoise) {
+      for (let x = 0; x < topNoise[topNoise.length - 1].length; x++) {
+        let topNoiseValue = topNoise[topNoise.length - 1][x];
 
+        noise[0][x] = MathHelper.interpolate(noise[0][x], topNoiseValue, step);
+        for (let i = 1; i < blockSmooth; i++) {
+          noise[i][x] = MathHelper.interpolate(noise[i][x], noise[i - 1][x], step);
+        }
+      }
     }
 
     if (bottomNoise) {
+      for (let x = 0; x < bottomNoise[0].length; x++) {
+        let bottomNoiseValue = bottomNoise[0][x];
 
+        noise[noise.length - 1][x] = MathHelper.interpolate(noise[noise.length - 1][x], bottomNoiseValue, step);
+        for (let i = 1; i < blockSmooth; i++) {
+          noise[noise.length - 1 - i][x] = MathHelper.interpolate(noise[noise.length - 1 - i][x], noise[noise.length - i][x], step);
+        }
+      }
     }
 
     return noise;

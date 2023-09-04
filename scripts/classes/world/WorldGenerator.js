@@ -1,122 +1,90 @@
 class WorldGenerator {
-  static Debug = {
-    TICK_TIME_TO_GENERATE: 0,
-    TICK_TIME_TO_BAKE: 0,
-  }
+  static BIOME_NOISE_TIMES = 20;
+  static BIOME_NOISE_STEP = 0.4;
+
+  static HEIGHT_NOISE_TIMES = 6;
+  static HEIGHT_NOISE_STEP = 0.1
 
   static init(world) {
-    world.WorldGeneratorCache = {
-      slice: [0, 0]
-    };
+    world._chunks = [];
+    world._noises = {};
 
-    world.WorldGeneratorCache.noises = {
-      BIOMES: PerlinNoiseGenerator.noise({
-        size: [world._size[0], world._size[1]],
-        times: 20,
-        step: 0.4,
-        seed: world._seed * 2,
-      }),
-      BLOCKS: PerlinNoiseGenerator.noise({
-        size: world._size,
-        times: 6,
-        step: 0.1,
-        seed: world._seed * 5,
-      })
-    }
-
-    world._blocks = [];
     world.setState(World.States.GENERATING);
   }
 
   static generate(world) {
-    if (!world.WorldGeneratorCache) {
+    if (!world._chunks) {
       console.error("world.WorldGeneratorCache isnt exist.")
       world.setState(World.States.INIT);
     }
 
-    for (let i = 0; i < Application.CHUNK_GENERATION_PER_TICK; i++) {
-      if (world.getState() != World.States.IDLE) {
-        WorldGenerator.generateSlice(world, world.WorldGeneratorCache.slice[0], world.WorldGeneratorCache.slice[1]);
-        WorldGenerator.bakeSlice(world, world.WorldGeneratorCache.slice[0], world.WorldGeneratorCache.slice[1]);
-
-        // Считает/Переходит на следующие чанки (куски)
-        world.WorldGeneratorCache.slice[0]++;
-
-        if (world.WorldGeneratorCache.slice[0] >= Math.floor(world._size[0] / World.SliceSize[0])) {
-          world.WorldGeneratorCache.slice[0] = 0;
-          world.WorldGeneratorCache.slice[1]++;
-        }
-
-        if (world.WorldGeneratorCache.slice[1] >= Math.floor(world._size[0] / World.SliceSize[1])) {
-          world.setState(World.States.IDLE);
-        }
-      }
-    }
+    WorldGenerator.generateChunk(world)
+    
   }
 
-  static generateSlice(world, x, y) {
-    if (!world.WorldGeneratorCache) {
-      console.error(`cant generate slice. WorldGeneratorCache isnt exist.`);
-      world.setState(World.States.INIT);
+  static generateChunk(world, x, y, {leftChunk, rightChunk}) {
+    let biomeNoise = PerlinNoiseGenerator.noise({
+      size: World.ChunkSize,
+      times: WorldGenerator.BIOME_NOISE_TIMES,
+      step: WorldGenerator.BIOME_NOISE_STEP,
+      seed: world.getSeed() * x * y
+    })
+
+    let heightNoise = PerlinNoiseGenerator.noise({
+      size: World.ChunkSize,
+      times: WorldGenerator.HEIGHT_NOISE_TIMES,
+      step: WorldGenerator.HEIGHT_NOISE_STEP,
+      seed: world.getSeed() * x * y * 30
+    })
+
+    if (rightChunk) {
+      biomeNoise = PerlinNoiseGenerator.smoothNoise({
+        noise: biomeNoise,
+        rightNoise: rightChunk.biome,
+        step: 0.65
+      })
+      heightNoise = PerlinNoiseGenerator.smoothNoise({
+        noise: heightNoise,
+        rightNoise: rightChunk.height,
+        step: 0.3
+      })
     }
 
-    let timestomp = Date.now();
-    Application.EventBus.invoke(EventBus.TYPES.UPDATE_BLOCK_GENERATE_START, { x, y })
-
-    let noises = world.WorldGeneratorCache.noises;
-
-    for (let localY = 0; localY < World.SliceSize[1]; localY++) {
-      let globalY = World.SliceSize[1] * y + localY;
-      if (!world.getBlocks()[globalY]) {
-        world.getBlocks()[globalY] = [];
-      }
-
-      for (let localX = 0; localX < World.SliceSize[0]; localX++) {
-        let globalX = World.SliceSize[0] * x + localX;
-
-        let biome = world.getBiome(noises.BIOMES[globalY][globalX]);
-        let height = noises.BLOCKS[globalY][globalX];
-        let blockType = world.getBlockType(biome, height)
-
-        world.setBlock(globalX, globalY, new Block({
-          biome,
-          height,
-          rgb: blockType.rgb
-        }))
-      }
-    }
-    Application.EventBus.invoke(EventBus.TYPES.UPDATE_BLOCK_GENERATE_START, { x, y })
-    WorldGenerator.Debug.TICK_TIME_TO_GENERATE += Date.now() - timestomp;
-  }
-
-  static bakeSlice(world, x, y) {
-    if (!world._cache) {
-      let chunkSize = world.getBlockSize();
-
-      world._cache = document.createElement("canvas");
-      world._cache.width = chunkSize * world._size[0];
-      world._cache.height = chunkSize * world._size[1];
+    if (leftChunk) {
+      biomeNoise = PerlinNoiseGenerator.smoothNoise({
+        noise: biomeNoise,
+        leftNoise: leftChunk.biome,
+        step: 0.65
+      })
+      heightNoise = PerlinNoiseGenerator.smoothNoise({
+        noise: heightNoise,
+        leftNoise: leftChunk.height,
+        step: 0.3
+      })
     }
 
-    let timestomp = Date.now();
-    let ctx = world._cache.getContext("2d");
+    
 
-    for (let localY = 0; localY < World.SliceSize[1]; localY++) {
-      let globalY = World.SliceSize[1] * y + localY;
-      if (!world.getBlocks()[globalY]) {
-        world.getBlocks()[globalY] = [];
-      }
+    let chunk = new Chunk(x, y, { biome: biomeNoise, height: heightNoise })
 
-      for (let localX = 0; localX < World.SliceSize[0]; localX++) {
-        let globalX = World.SliceSize[0] * x + localX;
+    /**
+     * 1) Шумы V
+     * 2) Сглаживание соседними
+     * 3) Биомы
+     * 4) Высоты
+     */
 
-        let block = world.getBlock(globalX, globalY);
+    for (let chunkY = 0; chunkY < World.ChunkSize[1]; chunkY++) {
+      for (let chunkX = 0; chunkX < World.ChunkSize[0]; chunkX++) {
+        let biome = world.getBiome(biomeNoise[chunkY][chunkX]);
+        let blockType = world.getBlockType(biome, heightNoise[chunkY][chunkX]);
 
-        ctx.fillStyle = block.getColor();
-        ctx.fillRect(globalX * world.getBlockSize(), globalY * world.getBlockSize(), world.getBlockSize(), world.getBlockSize());
+        chunk.setBlock(chunkX, chunkY, new Block({ blockType, biome: biome}))
+
+        //chunk.setBlock(chunkX, chunkY, new Block({ red: heightNoise[chunkY][chunkX] * 255, green: heightNoise[chunkY][chunkX] * 255, blue: heightNoise[chunkY][chunkX] * 255 }))
       }
     }
 
-    WorldGenerator.Debug.TICK_TIME_TO_BAKE += Date.now() - timestomp;
+    return chunk;
   }
 }

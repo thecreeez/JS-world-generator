@@ -1,6 +1,7 @@
 class PerlinNoiseGenerator {
-  static noise({size = [2,2], times, step, seed, offset = [0,0]}) {
-    let noiseArr = PerlinNoiseGenerator._noise({ xSize: size[0], ySize: size[1], seed, offset});
+  // Мб создавать шум по чанкам
+  static noise({ size = [2, 2], times, step, seed, offset = [0, 0] }) {
+    let noiseArr = PerlinNoiseGenerator._noise({ xSize: size[0], ySize: size[1], seed, offset });
 
     for (let i = 0; i < times; i++) {
       PerlinNoiseGenerator._interpolate(noiseArr, step);
@@ -9,23 +10,44 @@ class PerlinNoiseGenerator {
     return noiseArr;
   }
 
-  static _addNoises(noise1, noise2) {
-    let out = [];
-
-    for (let y = 0; y < noise1.length; y++) {
-      let noiseLine = [];
-
-      for (let x = 0; x < noise1[y].length; x++) {
-        noiseLine.push(MathHelper.interpolate(noise1[y][x], noise2[y][x], 0.3));
-      }
-
-      out.push(noiseLine);
+  // TO-DO: MAKE SMOOTH BITCH
+  static smoothNoise({ noise, leftNoise = null, rightNoise = null, topNoise = null, bottomNoise = null, times, step}) {
+    if (!noise) {
+      console.error(`noise is not presented.`)
+      return noise;
     }
 
-    return out;
+    if (!leftNoise && !rightNoise && !topNoise && !bottomNoise) {
+      console.error(`no need to smooth.`)
+      return noise;
+    }
+
+    if (leftNoise) {
+      for (let y = 0; y < leftNoise.length; y++) {
+        let leftNoiseValue = leftNoise[y][leftNoise[y].length - 1];        
+        noise[y][0] = MathHelper.interpolate(noise[y][0], leftNoiseValue, step);
+      }
+    }
+
+    if (rightNoise) {
+      for (let y = 0; y < rightNoise.length; y++) {
+        let rightNoiseValue = rightNoise[y][0];
+        noise[y][noise[y].length - 1] = MathHelper.interpolate(noise[y][noise[y].length - 1], rightNoiseValue, step);
+      }
+    }
+
+    if (topNoise) {
+
+    }
+
+    if (bottomNoise) {
+
+    }
+
+    return noise;
   }
 
-  static _noise({xSize, ySize, seed, offset}) {
+  static _noise({ xSize, ySize, seed, offset }) {
     let noiseArr = [];
 
     for (let y = offset[1]; y < ySize + offset[1]; y++) {
@@ -33,8 +55,7 @@ class PerlinNoiseGenerator {
 
       for (let x = offset[0]; x < xSize + offset[0]; x++) {
         let random = MathHelper.createRandom(seed * x * y);
-        // -1 или 1
-        let randomNum = MathHelper.randomInt(0, 1, random) * 2 - 1;
+        let randomNum = MathHelper.randomInt(-1, 1, random);
 
         noiseLine.push(randomNum);
       }
@@ -52,7 +73,7 @@ class PerlinNoiseGenerator {
         let prevLeft = arr[y][x - 1] ? arr[y][x - 1] : arr[y][x];
         let nextBot = arr[y + 1] ? arr[y + 1][x] : arr[y][x];
         let nextRight = arr[y][x + 1] ? arr[y][x + 1] : arr[y][x];
-        
+
         arr[y][x] = MathHelper.interpolate(arr[y][x], prevTop, step);
         arr[y][x] = MathHelper.interpolate(arr[y][x], prevLeft, step);
         arr[y][x] = MathHelper.interpolate(arr[y][x], nextBot, step);

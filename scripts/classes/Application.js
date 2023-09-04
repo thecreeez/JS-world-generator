@@ -6,6 +6,7 @@ class Application {
   static DEBUG_MODE = false;
 
   static CHUNK_GENERATION_PER_TICK = 1;
+  static TEXTURE_SIZE = 1;
 
   static RandomTypes = {
     FullRandom: "Случайно",

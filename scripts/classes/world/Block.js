@@ -1,61 +1,22 @@
 class Block {
-  static Tags = {
-    NeedToGenerate: "NeedToGenerate"
-  }
-
-  constructor({red = 0, green = 0, blue = 0, alpha = 1, height = 0, biome = World.Biomes.DEFAULT, tags = [], rgb = [0,0,0]} = {}) {
+  constructor({red = 0, green = 0, blue = 0, alpha = 1, height = 0, biome = null, blockType = null} = {}) {
     this._red = red;
     this._green = green;
     this._blue = blue;
-    this._alpha = 1;
+    this._alpha = alpha;
     this._height = height;
- 
-    if (rgb) {
-      this._red = rgb[0];
-      this._green = rgb[1];
-      this._blue = rgb[2];
-    }
 
-    this._tags = tags;
     this._biome = biome;
-  }
 
-  addTag(tag) {
-    if (this.hasTag(tag)) {
-      return false;
+    if (blockType) {
+      this._red = blockType._red;
+      this._green = blockType._green;
+      this._blue = blockType._blue;
     }
-
-    this._tags.push(tag);
-    return true;
-  }
-
-  hasTag(tag) {
-    let bHas = false;
-
-    this._tags.forEach((tagCandidate) => {
-      if (!bHas && tagCandidate == tag) {
-        bHas = true;
-      }
-    })
-
-    return bHas;
-  }
-
-  removeTag(tag) {
-    if (!this.hasTag(tag)) {
-      return false;
-    }
-
-    this._tags = this._tags.filter((tagCandidate) => tagCandidate != tag)
-    return true;
   }
 
   setBiome(biome) {
     this._biome = biome;
-
-    if (this.hasTag(Chunk.Tags.NeedToGenerate)) {
-      this.setColor(biome.rgb);
-    }
   }
 
   setColor(rgb) {

@@ -13,7 +13,7 @@ class Chunk {
     this.height = height;
     this.biome = biome;
 
-    this.animationTime = 10;
+    this.animationTime = 100;
     this.currentAnimationTime = this.animationTime;
   }
 
@@ -86,11 +86,7 @@ class Chunk {
     }
 
     if (this.currentAnimationTime > 0) {
-      this.bake(this.currentAnimationTime / this.animationTime);
       this.currentAnimationTime--;
-
-      if (this.currentAnimationTime == 0)
-        this._needToBake = true;
     }
 
     return this._canvas;

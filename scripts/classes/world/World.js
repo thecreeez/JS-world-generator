@@ -88,6 +88,11 @@ class World {
             ctx.fillStyle = `rgba(255,255,255,0.5)`;
             ctx.fillRect(x * chunkSize, y * chunkSize, chunkSize, chunkSize);
           }
+
+          if (renderChunk.animationTime > 0) {
+            ctx.fillStyle = `rgba(255,255,255,${renderChunk.currentAnimationTime / renderChunk.animationTime})`;
+            ctx.fillRect(x * chunkSize, y * chunkSize, chunkSize, chunkSize);
+          }
         }
       } 
     }
@@ -148,8 +153,6 @@ class World {
 
     /**
      * ПЕРЕДЕЛАТЬ ЧТОБ ТИПА ЧЕТНЫЕ ПОЗИТИВНЫЕ НЕЧЕТНЫЕ НЕГАТИВНЫЕ НУ ТЫ ПОНЯЛ
-     * 
-     * пофиксить еще что крестовидный неспаун проихсдоит
      */
 
     for (let xNegative = 0; xNegative > -cameraDistanceToRender; xNegative--) {

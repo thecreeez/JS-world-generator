@@ -1,5 +1,5 @@
 class World {
-  static ChunkSize = [50, 50]
+  static ChunkSize = [20, 10]
 
   static States = {
     INIT: "init",

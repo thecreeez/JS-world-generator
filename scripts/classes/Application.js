@@ -146,7 +146,7 @@ class Application {
 
     let text = "[thecreeez generation]";
 
-    ctx.fillStyle = `rgba(255,255,255,${Application._currentLogoTime / Application._keyToLogoStartsDissapear})`;
+    ctx.fillStyle = `rgba(${255 - Application.World.getBackgroundColor()[[0]]},${255 - Application.World.getBackgroundColor()[1]},${255 - Application.World.getBackgroundColor()[2]},${Application._currentLogoTime / Application._keyToLogoStartsDissapear})`;
     ctx.fillText(text, canvas.width / 2, canvas.height / 2);
   }
 }

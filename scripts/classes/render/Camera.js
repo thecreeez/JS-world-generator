@@ -5,7 +5,7 @@ class Camera {
     this._chunkDefaultSize = 250;
 
     this._distanceToRender = 10;
-    this._distanceToGenerate = 10
+    this._distanceToGenerate = 4
 
     this._speed = World.ChunkSize[0] / 10;
   }

@@ -12,6 +12,9 @@ class Chunk {
 
     this.height = height;
     this.biome = biome;
+
+    this.animationTime = 10;
+    this.currentAnimationTime = this.animationTime;
   }
 
   getBlock(x, y) {
@@ -50,7 +53,7 @@ class Chunk {
   }
 
   // Рендер чанка в контексте и особой позиции
-  bake() {
+  bake(alpha = 0) {
     let ctx = this._canvas.getContext("2d");
 
     for (let y = 0; y < World.ChunkSize[1]; y++) {
@@ -71,12 +74,23 @@ class Chunk {
       ctx.strokeRect(0, 0, this._canvas.width, this._canvas.height);
     }
 
+    ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+    ctx.fillRect(0, 0, this._canvas.width, this._canvas.height);
+
     this._needToBake = false;
   }
 
   getCanvas() {
     if (this._needToBake) {
       this.bake();
+    }
+
+    if (this.currentAnimationTime > 0) {
+      this.bake(this.currentAnimationTime / this.animationTime);
+      this.currentAnimationTime--;
+
+      if (this.currentAnimationTime == 0)
+        this._needToBake = true;
     }
 
     return this._canvas;

@@ -28,4 +28,22 @@ class MathHelper {
   static randomSeed() {
     return Math.floor(Math.random() * Math.random() * 1000000)
   }
+
+  static globalToChunkPos(pos) {
+    return [Math.floor(pos[0] / World.ChunkSize[0]), Math.floor(pos[1] / World.ChunkSize[1])]
+  }
+
+  static globalToChunkLocalPos(pos) {
+    let localPos = [pos[0] % World.ChunkSize[0], pos[1] % World.ChunkSize[1]];
+
+    if (localPos[0] < 0) {
+      localPos[0] = World.ChunkSize[0] + localPos[0];
+    }
+
+    if (localPos[1] < 0) {
+      localPos[1] = World.ChunkSize[1] + localPos[1];
+    }
+
+    return localPos;
+  }
 }

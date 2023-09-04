@@ -1,5 +1,5 @@
 class BiomeTypes {
-  static OCEAN = {
+  /*static OCEAN = {
     name: "ocean",
     height: 0,
     rgb: [35, 119, 181],
@@ -22,28 +22,52 @@ class BiomeTypes {
         name: "ocean"
       }
     }
-  }
+  }*/
 
   static DEFAULT = {
     name: "Default",
     height: 0.15,
     rgb: [67, 179, 2],
     blocks: {
+      DEEP_OCEAN: {
+        blockType: BlockTypes.DEEP_OCEAN,
+        height: -0.2,
+        name: "ocean_little_deep"
+      },
+
+      OCEAN: {
+        blockType: BlockTypes.OCEAN,
+        height: 0,
+        name: "ocean"
+      },
+
+      SAND: {
+        blockType: BlockTypes.SAND,
+        height: 0.2,
+        name: "sand"
+      },
+
       GRASS: {
         blockType: BlockTypes.GRASS,
-        height: 0.2,
+        height: 0.6,
         name: "grass"
+      },
+
+      STONE: {
+        blockType: BlockTypes.STONE,
+        height: 0.7,
+        name: "stone"
       },
 
       FOREST: {
         blockType: BlockTypes.FOREST,
-        height: 0.5,
+        height: 1,
         name: "forest"
       }
     }
   }
 
-  static HILLS = {
+  /*static HILLS = {
     name: "hills",
     height: 1,
     rgb: [194, 196, 194],
@@ -72,5 +96,5 @@ class BiomeTypes {
         name: "snow_hills"
       }
     }
-  }
+  }*/
 }

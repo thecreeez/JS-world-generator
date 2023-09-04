@@ -2,8 +2,8 @@ class WorldGenerator {
   static BIOME_NOISE_TIMES = 20;
   static BIOME_NOISE_STEP = 0.4;
 
-  static HEIGHT_NOISE_TIMES = 6;
-  static HEIGHT_NOISE_STEP = 0.1
+  static HEIGHT_NOISE_TIMES = 10;
+  static HEIGHT_NOISE_STEP = 0.6  
 
   static init(world) {
     world._chunks = [];

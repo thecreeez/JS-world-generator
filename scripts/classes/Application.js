@@ -5,8 +5,10 @@ class Application {
   static World;
   static DEBUG_MODE = false;
 
-  static CHUNK_GENERATION_PER_TICK = 3;
+  static CHUNK_GENERATION_PER_TICK = 2;
   static TEXTURE_SIZE = 1;
+
+  static MAX_CHANGE_BLOCKS_PER_COMMAND = 100000;
 
   static mousePos = [0,0]
 

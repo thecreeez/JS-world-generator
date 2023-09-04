@@ -1,11 +1,11 @@
 class Camera {
   constructor({ pos = [0,0] } = {}) {
     this._pos = pos;
-    this._fov = 1;
-    this._chunkDefaultSize = 250;
+    this._fov = 0.3;
+    this._chunkDefaultSize = 400;
 
-    this._distanceToRender = 10;
-    this._distanceToGenerate = 4
+    this._distanceToRender = 40;
+    this._distanceToGenerate = 4;
 
     this._speed = World.ChunkSize[0] / 10;
   }

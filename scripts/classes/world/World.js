@@ -80,7 +80,7 @@ class World {
       for (let x = chunksBoundsToRender.min[0]; x < chunksBoundsToRender.max[0]; x++) {
         let renderChunk = this.getChunk(x, y);
         if (renderChunk) {
-          ctx.drawImage(renderChunk.getCanvas(), x * chunkSize, y * chunkSize, chunkSize + 1, chunkSize + 1);
+          ctx.drawImage(renderChunk.getCanvas(), x * chunkSize, y * chunkSize, chunkSize, chunkSize);
 
           chunksToRender++;
           // Если чанк камеры
@@ -195,7 +195,7 @@ class World {
   }
 
   setChunk(x, y, chunk) {
-    console.log("new chunk: "+x+","+y)
+    //console.log("new chunk: "+x+","+y)
     return this._chunks.set(`${x}:${y}`, chunk);
   }
 

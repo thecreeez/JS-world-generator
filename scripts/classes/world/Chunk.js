@@ -35,10 +35,12 @@ class Chunk {
   setBlock(x, y, block) {
     if (y < 0 || y > World.ChunkSize[1]) {
       console.error(`[SETBLOCK ERROR] y out of bounds: ${y}`)
+      return
     }
 
     if (x < 0 || x > World.ChunkSize[0]) {
-      console.error(`[SETBLOCK ERROR] y out of bounds: ${x}`)
+      console.error(`[SETBLOCK ERROR] x out of bounds: ${x}`)
+      return
     }
 
     if (!this._blocks[y])
@@ -71,6 +73,7 @@ class Chunk {
 
     if (Application.DEBUG_MODE) {
       ctx.strokeStyle = "rgba(255,255,255,0.3)";
+      ctx.lineWidth = 2;
       ctx.strokeRect(0, 0, this._canvas.width, this._canvas.height);
     }
 

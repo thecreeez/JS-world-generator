@@ -9,9 +9,9 @@ class Block {
     this._biome = biome;
 
     if (blockType) {
-      this._red = blockType._red;
-      this._green = blockType._green;
-      this._blue = blockType._blue;
+      this._red = blockType._red - blockType._red * (Math.random() / 6);
+      this._green = blockType._green - blockType._green * (Math.random() / 6);
+      this._blue = blockType._blue - blockType._blue * (Math.random() / 6);
     }
   }
 

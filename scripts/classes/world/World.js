@@ -84,7 +84,7 @@ class World {
 
           chunksToRender++;
           // Если чанк камеры
-          if (x == camera.getChunkPos()[0] && y == camera.getChunkPos()[1]) {
+          if (Application.DEBUG_MODE && x == camera.getChunkPos()[0] && y == camera.getChunkPos()[1]) {
             ctx.fillStyle = `rgba(255,255,255,0.5)`;
             ctx.fillRect(x * chunkSize, y * chunkSize, chunkSize, chunkSize);
           }
@@ -92,7 +92,9 @@ class World {
       } 
     }
 
-    Application.UIManager.getElement(DebugHelper.DEBUG_HELPER_MENU_ID).getElement("ChunksRenderLabel").setValue(`Chunks rendered: ${chunksToRender}`)
+    if (Application.DEBUG_MODE) {
+      Application.UIManager.getElement(DebugHelper.DEBUG_HELPER_MENU_ID).getElement("ChunksRenderLabel").setValue(`Chunks rendered: ${chunksToRender}`)
+    }
     ctx.restore();
   }
 
@@ -103,7 +105,10 @@ class World {
       for (let i = 0; i < Math.min(chunksToGenerate.length, Application.CHUNK_GENERATION_PER_TICK); i++) {
         let chunkData = chunksToGenerate[i]; 
         this.setChunk(chunkData.x, chunkData.y, WorldGenerator.generateChunk(this, chunkData.x, chunkData.y, this.getAdjacentChunks(chunkData.x, chunkData.y)))
-        Application.UIManager.getElement(DebugHelper.DEBUG_HELPER_MENU_ID).getElement("ChunksUpdateLabel").setValue(`Chunks stored: ${this.getChunksCount()} (${this.getChunksCount() * World.ChunkSize[0] * World.ChunkSize[1]} blocks)`)
+
+        if (Application.DEBUG_MODE) {
+          Application.UIManager.getElement(DebugHelper.DEBUG_HELPER_MENU_ID).getElement("ChunksUpdateLabel").setValue(`Chunks stored: ${this.getChunksCount()} (${this.getChunksCount() * World.ChunkSize[0] * World.ChunkSize[1]} blocks)`)
+        }
       }
     }
   }

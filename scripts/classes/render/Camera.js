@@ -4,8 +4,8 @@ class Camera {
     this._fov = 1;
     this._chunkDefaultSize = 250;
 
-    this._distanceToRender = 5;
-    this._distanceToGenerate = 3
+    this._distanceToRender = 10;
+    this._distanceToGenerate = 10
 
     this._speed = World.ChunkSize[0] / 10;
   }
@@ -26,7 +26,9 @@ class Camera {
   }
 
   _onmove() {
-    Application.UIManager.getElement("DebugMenu").getElement("CameraLabel").setValue(`ChunkPos:[${this.getChunkPos()}] / Pos:[${this.getPos()}]`)
+    if (Application.DEBUG_MODE) {
+      Application.UIManager.getElement("DebugMenu").getElement("CameraLabel").setValue(`ChunkPos:[${this.getChunkPos()}] / Pos:[${this.getPos()}]`)
+    }
   }
 
   getPos() {

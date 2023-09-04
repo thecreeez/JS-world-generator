@@ -8,6 +8,8 @@ class Application {
   static CHUNK_GENERATION_PER_TICK = 3;
   static TEXTURE_SIZE = 1;
 
+  static mousePos = [0,0]
+
   static RandomTypes = {
     FullRandom: "Случайно",
     SeedRandom: "Псевдослучайно"
@@ -52,6 +54,8 @@ class Application {
 
     document.querySelector("canvas").onmousemove = (e) => {
       Application.UIManager.onmousemove([e.clientX, e.clientY]);
+
+      Application.mousePos = [e.clientX, e.clientY];
     }
 
     document.querySelector("canvas").onmousedown = (e) => {

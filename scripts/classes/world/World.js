@@ -67,7 +67,7 @@ class World {
     return max;
   }
 
-  render() {
+  render(deltaTime) {
     let camera = this.camera;
     let chunkSize = camera.getChunkSizeOnScreen();
     let chunksBoundsToRender = this.getChunkBoundsToRender();
@@ -94,6 +94,8 @@ class World {
 
           if (renderChunk.currentAnimationTime > 0) {
             chunkFogAlpha += renderChunk.currentAnimationTime / renderChunk.animationTime;
+
+            renderChunk.currentAnimationTime -= deltaTime;
           }
 
           if (chunkFogAlpha > 0) {
@@ -110,18 +112,29 @@ class World {
     ctx.restore();
   }
 
-  update() {
+  update(deltaTime) {
     let chunksToGenerate = this.getChunksToGenerate();
 
     if (chunksToGenerate.length > 0) {
-      for (let i = 0; i < Math.min(chunksToGenerate.length, Application.CHUNK_GENERATION_PER_TICK); i++) {
-        let chunkData = chunksToGenerate[i]; 
+      let startTime = Date.now();
+      let currentTime = Date.now();
+      let chunks = 0;
+
+      while (chunksToGenerate.length > 0 && currentTime - startTime < 1000 / Application.MAX_TICKS / 2) {
+        let chunkData = chunksToGenerate[0];
+
         this.setChunk(chunkData.x, chunkData.y, WorldGenerator.generateChunk(this, chunkData.x, chunkData.y, this.getAdjacentChunks(chunkData.x, chunkData.y)))
 
         if (Application.DEBUG_MODE) {
           Application.UIManager.getElement(DebugHelper.DEBUG_HELPER_MENU_ID).getElement("ChunksUpdateLabel").setValue(`Chunks stored: ${this.getChunksCount()} (${this.getChunksCount() * World.ChunkSize[0] * World.ChunkSize[1]} blocks)`)
         }
+
+        chunksToGenerate.splice(0, 1);
+        chunks++;
+        currentTime = Date.now();
       }
+
+      console.log("Time to generate: " + (currentTime - startTime) + " Max: " + Math.floor(1000 / Application.MAX_TICKS / 2) +" Chunks: "+chunks);
     }
   }
 

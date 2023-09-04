@@ -13,7 +13,7 @@ class Chunk {
     this.height = height;
     this.biome = biome;
 
-    this.animationTime = 100;
+    this.animationTime = 1000;
     this.currentAnimationTime = this.animationTime;
   }
 

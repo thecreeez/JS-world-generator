@@ -5,16 +5,23 @@ class Application {
   static World;
   static DEBUG_MODE = false;
 
-  static CHUNK_GENERATION_PER_TICK = 2;
   static TEXTURE_SIZE = 1;
+
+  static MAX_FPS = 60;
+  static MAX_TICKS = 20;
 
   static MAX_CHANGE_BLOCKS_PER_COMMAND = 100000;
 
-  static _logoTime = 300;
-  static _keyToLogoStartsDissapear = 30;
+  static _logoTime = 2000;
+  static _keyToLogoStartsDissapear = 500;
   static _currentLogoTime = Application._logoTime;
 
   static mousePos = [0,0]
+
+  static _deltaTimes = {
+    update: Date.now(),
+    render: Date.now()
+  }
 
   static RandomTypes = {
     FullRandom: "Случайно",
@@ -30,6 +37,8 @@ class Application {
 
   static start({ debug = false, ticksPerSecond = 60, fpsMax = 144 }) {
     Application.DEBUG_MODE = debug;
+    Application.MAX_FPS = fpsMax;
+    Application.MAX_TICKS = ticksPerSecond;
 
     this.EventBus.invoke(EventBus.TYPES.APPLICATION_START, {
       debug,
@@ -37,22 +46,26 @@ class Application {
       fpsMax
     })
 
+    Application.UIManager.addElement("cameraUI", CameraMenuUI.create([0, 0]));
+
     if (Application.DEBUG_MODE) {
       Application.UIManager.addElement(DebugHelper.DEBUG_HELPER_MENU_ID, DebugMenuUI.create([0, 0]));
-    }
 
-    Application.UIManager.addElement("cameraUI", CameraMenuUI.create([0, 0]));
+      Application.UIManager.getElement(DebugHelper.DEBUG_HELPER_MENU_ID).pinTo(Application.UIManager.getElement("cameraUI"))
+    }
 
     Application.World = new World({
       seed: MathHelper.randomSeed()
     })
 
     setInterval(() => {
-      Application.render()
+      Application.render(Date.now() - Application._deltaTimes.render)
+      Application._deltaTimes.render = Date.now();
     }, 1000 / fpsMax)
 
     setInterval(() => {
-      Application.update()
+      Application.update(Date.now() - Application._deltaTimes.update)
+      Application._deltaTimes.update = Date.now();
     }, 1000 / ticksPerSecond)
 
     // Счетчик для дебага
@@ -91,7 +104,7 @@ class Application {
     }
   }
 
-  static render() {
+  static render(deltaTime) {
     this.EventBus.invoke(EventBus.TYPES.RENDER_FRAME_START, {});
     
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -102,7 +115,7 @@ class Application {
       ctx.fillStyle = `rgb(${backColor[0]},${backColor[1]},${backColor[2]})`
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-      Application.World.render();
+      Application.World.render(deltaTime);
       this.EventBus.invoke(EventBus.TYPES.RENDER_WORLD_END, {});
     }
 
@@ -113,15 +126,15 @@ class Application {
 
     if (Application._currentLogoTime > 0) {
       this.renderLogo();
-      Application._currentLogoTime--;
+      Application._currentLogoTime -= deltaTime;
     }
 
     this.EventBus.invoke(EventBus.TYPES.RENDER_FRAME_END, {});
   }
 
-  static update() {
+  static update(deltaTime) {
     if (Application.World)
-      Application.World.update();
+      Application.World.update(deltaTime);
 
     DebugHelper.update();
   }

@@ -76,6 +76,11 @@ class Application {
         case "KeyA": Application.World.camera.move([-Application.World.camera.getSpeed(), 0]); break;
         case "KeyS": Application.World.camera.move([0, Application.World.camera.getSpeed()]); break;
         case "KeyD": Application.World.camera.move([Application.World.camera.getSpeed(), 0]); break;
+        case "Enter": {
+          let chunkPos = Application.World.camera.getChunkPos();
+          Application.World.setChunk(chunkPos[0], chunkPos[1], WorldGenerator.generateChunk(Application.World, chunkPos[0], chunkPos[1], Application.World.getAdjacentChunks(chunkPos[0], chunkPos[1])))
+          break;
+        }
       }
     }
   }

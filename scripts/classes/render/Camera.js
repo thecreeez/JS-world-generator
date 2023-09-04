@@ -1,11 +1,11 @@
 class Camera {
   constructor({ pos = [0,0] } = {}) {
     this._pos = pos;
-    this._fov = 0.3;
-    this._chunkDefaultSize = 400;
+    this._fov = 1;
+    this._chunkDefaultSize = 200;
 
-    this._distanceToRender = 10;
-    this._distanceToGenerate = 10;
+    this._distanceToRender = 5;
+    this._distanceToGenerate = 5;
 
     this._speed = World.ChunkSize[0] / 10;
   }
@@ -15,6 +15,18 @@ class Camera {
     this._pos[1] += pos[1];
 
     this._onmove();
+  }
+
+  setFOV(fov) {
+    this._fov = fov;
+  }
+
+  setRenderDistance(distance) {
+    this._distanceToRender = distance;
+  }
+
+  setGenerationDistance(distance) {
+    this._distanceToGenerate = distance;
   }
 
   getSpeed() {
@@ -44,6 +56,6 @@ class Camera {
   }
 
   getChunkSizeOnScreen() {
-    return this._chunkDefaultSize * this._fov;
+    return this._chunkDefaultSize / this._fov;
   }
 }

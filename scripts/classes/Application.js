@@ -38,8 +38,10 @@ class Application {
     })
 
     if (Application.DEBUG_MODE) {
-      Application.UIManager.addElement(DebugHelper.DEBUG_HELPER_MENU_ID, DebugMenuUI.create([0/*World.getBoundsOnScreen()[0]*/, 0]));
+      Application.UIManager.addElement(DebugHelper.DEBUG_HELPER_MENU_ID, DebugMenuUI.create([0, 0]));
     }
+
+    Application.UIManager.addElement("cameraUI", CameraMenuUI.create([0, 0]));
 
     Application.World = new World({
       seed: MathHelper.randomSeed()

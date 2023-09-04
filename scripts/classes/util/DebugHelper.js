@@ -23,7 +23,7 @@ class DebugHelper {
     DebugHelper._UPS_ON_THIS_SECOND = 0;
 
     if (Application.DEBUG_MODE) {
-      Application.UIManager.getElement("DebugMenu").getElement("UpsAndFpsLabel").setValue(`FPS: ${DebugHelper.FPS} UPS: ${DebugHelper.UPS}`)
+      Application.UIManager.getElement(DebugHelper.DEBUG_HELPER_MENU_ID).getElement("UpsAndFpsLabel").setValue(`FPS: ${DebugHelper.FPS} UPS: ${DebugHelper.UPS}`)
     }
   }
 

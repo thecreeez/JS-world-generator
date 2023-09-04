@@ -17,9 +17,6 @@ class WorldGenerator {
       console.error("world.WorldGeneratorCache isnt exist.")
       world.setState(World.States.INIT);
     }
-
-    WorldGenerator.generateChunk(world)
-    
   }
 
   static generateChunk(world, x, y, {leftChunk, rightChunk, topChunk, bottomChunk}) {
@@ -37,8 +34,8 @@ class WorldGenerator {
       seed: world.getSeed() * x * y * 30
     })
 
-    let biomeStep = 0.6;
-    let heightStep = 0.3
+    let biomeStep = 0.7;
+    let heightStep = 0.4
 
     if (rightChunk) {
       biomeNoise = PerlinNoiseGenerator.smoothNoise({
@@ -94,19 +91,12 @@ class WorldGenerator {
 
     let chunk = new Chunk(x, y, { biome: biomeNoise, height: heightNoise })
 
-    /**
-     * 1) Шумы V
-     * 2) Сглаживание соседними
-     * 3) Биомы
-     * 4) Высоты
-     */
-
     for (let chunkY = 0; chunkY < World.ChunkSize[1]; chunkY++) {
       for (let chunkX = 0; chunkX < World.ChunkSize[0]; chunkX++) {
         let biome = world.getBiome(biomeNoise[chunkY][chunkX]);
         let blockType = world.getBlockType(biome, heightNoise[chunkY][chunkX]);
 
-        chunk.setBlock(chunkX, chunkY, new Block({ blockType, biome: biome}))
+        chunk.setBlock(chunkX, chunkY, new Block({ blockType, biome: biome}));
 
         //chunk.setBlock(chunkX, chunkY, new Block({ red: biomeNoise[chunkY][chunkX] * 255, green: biomeNoise[chunkY][chunkX] * 255, blue: biomeNoise[chunkY][chunkX] * 255 }))
       }

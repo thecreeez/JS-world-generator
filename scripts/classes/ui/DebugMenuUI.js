@@ -14,18 +14,31 @@ class DebugMenuUI {
       text: `FPS: 0 UPS: 0`
     }))
 
+    container.addElement(`CameraLabel`, new UILabel({
+      manager: Application.UIManager,
+      isRender: true,
+      text: `x: 0, y: 0`
+    }))
+
+    container.addElement(`ChunksUpdateLabel`, new UILabel({
+      manager: Application.UIManager,
+      isRender: true,
+      text: `Chunks stored: `
+    }))
+
+    container.addElement(`ChunksRenderLabel`, new UILabel({
+      manager: Application.UIManager,
+      isRender: true,
+      text: `Chunks rendered: `
+    }))
+
     container.addElement("MoveButton", new UIButton({
       manager: Application.UIManager,
-      text: "Очистить",
+      text: "test",
       isActive: true,
       isRender: true,
       onClick: (elem, pos) => {
-        Application.World.invertSlice(2,2);
-
-        //setTimeout(() => {
-        //  WorldGenerator.generateSlice(Application.World, 2, 2);
-        //  WorldGenerator.bakeSlice(Application.World, 2, 2);
-        //}, 1000)
+        
       }
     }))
 

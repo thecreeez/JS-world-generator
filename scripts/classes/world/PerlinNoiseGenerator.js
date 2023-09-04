@@ -11,7 +11,7 @@ class PerlinNoiseGenerator {
   }
 
   // Сглаживает разницу между шумами (берет только самый крайний и сглаживает ровно blockSmooth значений)
-  static smoothNoise({ noise, leftNoise = null, rightNoise = null, topNoise = null, bottomNoise = null, blockSmooth = 3, step}) {
+  static smoothNoise({ noise, leftNoise = null, rightNoise = null, topNoise = null, bottomNoise = null, blockSmooth = 5, step}) {
     if (!noise) {
       console.error(`noise is not presented.`)
       return noise;

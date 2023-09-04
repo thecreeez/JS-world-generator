@@ -45,6 +45,10 @@ class Chunk {
     this._needToBake = true;
   }
 
+  getChunkPos() {
+    return [this._x, this._y];
+  }
+
   // Рендер чанка в контексте и особой позиции
   bake() {
     let ctx = this._canvas.getContext("2d");
@@ -62,8 +66,10 @@ class Chunk {
       }
     }
 
-    ctx.strokeStyle = "rgba(255,255,255,0.3)";
-    ctx.strokeRect(0, 0, this._canvas.width, this._canvas.height);
+    if (Application.DEBUG_MODE) {
+      ctx.strokeStyle = "rgba(255,255,255,0.3)";
+      ctx.strokeRect(0, 0, this._canvas.width, this._canvas.height);
+    }
 
     this._needToBake = false;
   }

@@ -11,4 +11,6 @@ class BlockTypes {
   
   static MOUNTAIN = new Block({ red: 76, green: 76, blue: 76 })
   static SNOW_MOUNTAIN = new Block({ red: 194, green: 196, blue: 194 })
+
+  static ONLY_RED = new Block({ red: 255, green: 0, blue: 0 })
 }

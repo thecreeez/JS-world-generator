@@ -1,7 +1,5 @@
 class World {
-
-  static DefaultSize = [200, 200]
-  static ChunkSize = [30, 30]
+  static ChunkSize = [50, 50]
 
   static States = {
     INIT: "init",
@@ -10,35 +8,15 @@ class World {
     IDLE: "idle"
   }
 
-  static getBoundsOnScreen(size = World.DefaultSize) {
-    let chunkSize = canvas.height / size[1] < canvas.width / size[0] ? canvas.height / size[1] : canvas.width / size[0];
-
-    return [chunkSize * size[0], chunkSize * size[1]];
-  }
-
-  constructor({ size = World.DefaultSize, perlinSettings, seed = MathHelper.randomSeed(), offset = [0,0] } = {}) {
+  constructor({ size = World.DefaultSize, perlinSettings, seed = MathHelper.randomSeed() } = {}) {
     this._size = size;
     this._perlinSettings = perlinSettings;
     this._seed = seed;
-    this.offset = offset;
+    this.camera = new Camera();
+
+    this._chunks = new Map();
 
     this._state = World.States.INIT;
-  }
-
-  // DEPRECATED
-  _createRenderQueue() {
-    this._renderQueue = [];
-
-    for (let y = 0; y < this._blocks.length; y++) {
-      for (let x = 0; x < this._blocks[y].length; x++) {
-        this._renderQueue.push({
-          chunk: this._blocks[y][x],
-          pos: [x, y]
-        });
-      }
-    }
-
-    this._renderQueue.sort((a, b) => a.chunk.getHeightWithBiomeHeight() - b.chunk.getHeightWithBiomeHeight());
   }
 
   getBlockType(biome, height) {
@@ -89,39 +67,128 @@ class World {
   }
 
   render() {
-    if (!this._cache) {
-      return;
+    let camera = this.camera;
+    let chunkSize = camera.getChunkSizeOnScreen();
+    let chunksBoundsToRender = this.getChunkBoundsToRender();
+
+    ctx.save()
+    ctx.translate(canvas.width / 2 - chunkSize / 2 - camera.getPos()[0] * (chunkSize / World.ChunkSize[0]), canvas.height / 2 - chunkSize / 2 - camera.getPos()[1] * (chunkSize / World.ChunkSize[0]));
+
+    let chunksToRender = 0;
+
+    for (let y = chunksBoundsToRender.min[1]; y < chunksBoundsToRender.max[1]; y++) {
+      for (let x = chunksBoundsToRender.min[0]; x < chunksBoundsToRender.max[0]; x++) {
+        let renderChunk = this.getChunk(x, y);
+        if (renderChunk) {
+          ctx.drawImage(renderChunk.getCanvas(), x * chunkSize, y * chunkSize, chunkSize + 1, chunkSize + 1);
+
+          chunksToRender++;
+          // Если чанк камеры
+          if (x == camera.getChunkPos()[0] && y == camera.getChunkPos()[1]) {
+            ctx.fillStyle = `rgba(255,255,255,0.5)`;
+            ctx.fillRect(x * chunkSize, y * chunkSize, chunkSize, chunkSize);
+          }
+        }
+      } 
     }
 
-    this._cache.getContext("2d").drawImage(this._cache, this.test, 0);
-    ctx.drawImage(this._cache, 0, 0);
-
-    this.test+=0.05;
-    /**
-     * 1) Движение камеры
-     * 2) Перемещение карты
-     * 3) Дорисовка чанков
-     */
-
-    //this.WorldGeneratorCache.noises.CHUNKS.forEach((noiseLine, y) => {
-    //  noiseLine.forEach((noiseValue, x) => {
-    //    let noiseValueToRGB = (noiseValue + 1) / 2 * 127.5;
-    //    ctx.fillStyle = `rgba(${noiseValueToRGB},${noiseValueToRGB},${noiseValueToRGB},0.6)`;
-    //    ctx.fillRect(x * chunkSize, y * chunkSize, chunkSize, chunkSize);
-    //  })
-    //})
+    Application.UIManager.getElement(DebugHelper.DEBUG_HELPER_MENU_ID).getElement("ChunksRenderLabel").setValue(`Chunks rendered: ${chunksToRender}`)
+    ctx.restore();
   }
 
   update() {
-    switch (this._state) {
-      case (World.States.INIT): WorldGenerator.init(this); return;
-      case (World.States.GENERATING): WorldGenerator.generate(this); return;
-      case (World.States.IDLE): return;
+    let chunksToGenerate = this.getChunksToGenerate();
+
+    if (chunksToGenerate.length > 0) {
+      for (let i = 0; i < Math.min(chunksToGenerate.length, Application.CHUNK_GENERATION_PER_TICK); i++) {
+        let chunkData = chunksToGenerate[i]; 
+        this.setChunk(chunkData.x, chunkData.y, WorldGenerator.generateChunk(this, chunkData.x, chunkData.y, this.getAdjacentChunks(chunkData.x, chunkData.y)))
+        Application.UIManager.getElement(DebugHelper.DEBUG_HELPER_MENU_ID).getElement("ChunksUpdateLabel").setValue(`Chunks stored: ${this.getChunksCount()} (${this.getChunksCount() * World.ChunkSize[0] * World.ChunkSize[1]} blocks)`)
+      }
     }
   }
 
-  getBlockSize() {
-    return canvas.height / this._size[1] < canvas.width / this._size[0] ? canvas.height / this._size[1] : canvas.width / this._size[0];
+  getAdjacentChunks(x, y) {
+    return {
+      leftChunk: this.getChunk(x - 1, y),
+      rightChunk: this.getChunk(x + 1, y),
+      topChunk: this.getChunk(x, y - 1), 
+      bottomChunk: this.getChunk(x, y + 1),
+    };
+  }
+
+  getChunkBoundsToRender() {
+    let camera = this.camera;
+
+    let cameraPos = camera.getChunkPos();
+    let cameraDistance = camera.getDistanceToRender();
+
+    return {
+      min: [cameraPos[0] - cameraDistance, cameraPos[1] - cameraDistance],
+      max: [cameraPos[0] + cameraDistance, cameraPos[1] + cameraDistance],
+    }
+  }
+
+  getChunksToGenerate() {
+    let camera = this.camera;
+
+    let chunksToGenerate = [];
+
+    let cameraChunkPos = camera.getChunkPos();
+    let cameraDistanceToRender = camera.getDistanceToGenerate();
+
+    if (!this.getChunk(cameraChunkPos[0], cameraChunkPos[1])) {
+      chunksToGenerate.push({ x: cameraChunkPos[0], y: cameraChunkPos[1]})
+    }
+
+    /**
+     * ПЕРЕДЕЛАТЬ ЧТОБ ТИПА ЧЕТНЫЕ ПОЗИТИВНЫЕ НЕЧЕТНЫЕ НЕГАТИВНЫЕ НУ ТЫ ПОНЯЛ
+     * 
+     * пофиксить еще что крестовидный неспаун проихсдоит
+     */
+
+    for (let xNegative = 0; xNegative > -cameraDistanceToRender; xNegative--) {
+      for (let yNegative = 0; yNegative > -cameraDistanceToRender; yNegative--) {
+        if (!this.getChunk(cameraChunkPos[0] + xNegative, cameraChunkPos[1] + yNegative) && !(xNegative == 0 && yNegative == 0)) {
+          chunksToGenerate.push({ x: cameraChunkPos[0] + xNegative, y: cameraChunkPos[1] + yNegative })
+        }
+      }
+
+      for (let yPositive = 0; yPositive < cameraDistanceToRender; yPositive++) {
+        if (!this.getChunk(cameraChunkPos[0] + xNegative, cameraChunkPos[1] + yPositive) && !(xNegative == 0 && yPositive == 0)) {
+          chunksToGenerate.push({ x: cameraChunkPos[0] + xNegative, y: cameraChunkPos[1] + yPositive })
+        }
+      }
+    }
+
+    for (let xPositive = 0; xPositive < cameraDistanceToRender; xPositive++) {
+      for (let yNegative = 0; yNegative > -cameraDistanceToRender; yNegative--) {
+        if (!this.getChunk(cameraChunkPos[0] + xPositive, cameraChunkPos[1] + yNegative) && !(xPositive == 0 && yNegative == 0)) {
+          chunksToGenerate.push({ x: cameraChunkPos[0] + xPositive, y: cameraChunkPos[1] + yNegative })
+        }
+      }
+
+      for (let yPositive = 0; yPositive < cameraDistanceToRender; yPositive++) {
+        if (!this.getChunk(cameraChunkPos[0] + xPositive, cameraChunkPos[1] + yPositive) && !(xPositive == 0 && yPositive == 0)) {
+          chunksToGenerate.push({ x: cameraChunkPos[0] + xPositive, y: cameraChunkPos[1] + yPositive })
+        }
+      }
+    }
+
+    return chunksToGenerate;
+  }
+
+  getChunksCount() {
+    return this._chunks.size;
+  }
+
+  getChunk(x, y) {
+    return this._chunks.get(`${x}:${y}`);
+  }
+
+  setChunk(x, y, chunk) {
+    console.log("new chunk: "+x+","+y)
+    return this._chunks.set(`${x}:${y}`, chunk);
   }
 
   setState(state) {
@@ -129,60 +196,6 @@ class World {
   }
   getState() {
     return this._state;
-  }
-
-  getBlocks() {
-    return this._blocks;
-  }
-
-  setBlock(x, y, block) {
-    if (x < 0 || x > this._size[0]) {
-      console.error(`x pos out of bounds.`)
-      return;
-    }
-
-    if (y < 0 || y > this._size[1]) {
-      console.error(`y pos out of bounds.`)
-      return;
-    }
-
-    this._blocks[y][x] = block;
-
-    if (this.getState() == World.States.IDLE)
-      WorldGenerator.bakeSlice(this, Math.floor(x / World.SliceSize[0]), Math.floor(y / World.SliceSize[1]))
-  }
-
-  getBlock(x, y) {
-    if (y < 0 || y > this._size[1]) {
-      console.error(`y pos out of bounds.`)
-      return;
-    }
-
-    if (x < 0 || x > this._size[0]) {
-      console.error(`y pos out of bounds.`)
-      return;
-    }
-
-    return this._blocks[y][x];
-  }
-
-  invertSlice(xSlice, ySlice) {
-    for (let y = 0; y < World.SliceSize[1]; y++) {
-      let globalY = ySlice * World.SliceSize[1] + y;
-      for (let x = 0; x < World.SliceSize[0]; x++) {
-        let globalX = xSlice * World.SliceSize[0] + x;
-
-        let block = this.getBlock(globalX, globalY);
-
-        block.setColor([
-          255 - block._red,
-          255 - block._green,
-          255 - block._blue
-        ]);
-      }
-    }
-
-    WorldGenerator.bakeSlice(this, xSlice, ySlice);
   }
 
   getSeed() {

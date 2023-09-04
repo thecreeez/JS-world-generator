@@ -5,7 +5,7 @@ class Application {
   static World;
   static DEBUG_MODE = false;
 
-  static CHUNK_GENERATION_PER_TICK = 1;
+  static CHUNK_GENERATION_PER_TICK = 3;
   static TEXTURE_SIZE = 1;
 
   static RandomTypes = {
@@ -50,8 +50,6 @@ class Application {
       DebugHelper.count();
     }, 1000)
 
-    //Application.UIManager.addElement("MainMenu", MainMenuUI.create());
-
     document.querySelector("canvas").onmousemove = (e) => {
       Application.UIManager.onmousemove([e.clientX, e.clientY]);
     }
@@ -66,6 +64,13 @@ class Application {
 
     window.onkeydown = (e) => {
       Application.UIManager.onkeydown(e.key, e.code)
+
+      switch (e.code) {
+        case "KeyW": Application.World.camera.move([0, -Application.World.camera.getSpeed()]);  break;
+        case "KeyA": Application.World.camera.move([-Application.World.camera.getSpeed(), 0]); break;
+        case "KeyS": Application.World.camera.move([0, Application.World.camera.getSpeed()]); break;
+        case "KeyD": Application.World.camera.move([Application.World.camera.getSpeed(), 0]); break;
+      }
     }
   }
 

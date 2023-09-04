@@ -67,6 +67,26 @@ class CameraMenuUI {
       Application.World.camera.setGenerationDistance(value);
     }
 
+    container.addElement("CameraSpeedLabel", new UILabel({
+      manager: Application.UIManager,
+      isRender: true,
+      text: "Скорость камеры"
+    }))
+
+    container.addElement("CameraSpeedSlider", new UISlider({
+      manager: Application.UIManager,
+      isActive: true,
+      isRender: true,
+      min: 0,
+      max: World.ChunkSize[0],
+      isInt: true,
+      value: World.ChunkSize[0] / 10
+    }))
+
+    container.getElement(`CameraSpeedSlider`).onchange = (elem, value) => {
+      Application.World.camera.setSpeed(value);
+    }
+
     return container;
   }
 }

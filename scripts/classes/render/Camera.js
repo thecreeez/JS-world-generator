@@ -2,7 +2,7 @@ class Camera {
   constructor({ pos = [0,0] } = {}) {
     this._pos = pos;
     this._fov = 1;
-    this._chunkDefaultSize = 200;
+    this._chunkDefaultSize = 70;
 
     this._distanceToRender = 5;
     this._distanceToGenerate = 5;
@@ -27,6 +27,10 @@ class Camera {
 
   setGenerationDistance(distance) {
     this._distanceToGenerate = distance;
+  }
+
+  setSpeed(speed) {
+    this._speed = speed;
   }
 
   getSpeed() {

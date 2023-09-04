@@ -97,7 +97,6 @@ class WorldGenerator {
         let blockType = world.getBlockType(biome, heightNoise[chunkY][chunkX]);
 
         chunk.setBlock(chunkX, chunkY, new Block({ blockType, biome: biome}));
-
         //chunk.setBlock(chunkX, chunkY, new Block({ red: biomeNoise[chunkY][chunkX] * 255, green: biomeNoise[chunkY][chunkX] * 255, blue: biomeNoise[chunkY][chunkX] * 255 }))
       }
     }

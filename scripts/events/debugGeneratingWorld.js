@@ -1,47 +1,84 @@
-Application.EventBus.subscribe(EventBus.TYPES.UPDATE_CHUNK_BAKE_START, () => {
-  Application.Profilers.UPS_PROFILER.startTask("baking slice");
-})
-
-Application.EventBus.subscribe(EventBus.TYPES.UPDATE_CHUNK_BAKE_END, () => {
-  Application.Profilers.UPS_PROFILER.endTask("baking slice");
-})
-
-Application.EventBus.subscribe(EventBus.TYPES.UPDATE_CHUNK_GENERATE_START, () => {
-
-})
-
-Application.EventBus.subscribe(EventBus.TYPES.UPDATE_CHUNK_GENERATE_END, () => {
-  
-})
-
 Application.EventBus.subscribe(EventBus.TYPES.UPDATE_START, () => {
 
 })
 
-Application.EventBus.subscribe(EventBus.TYPES.UPDATE_END, () => {
+Application.EventBus.subscribe(EventBus.TYPES.UPDATE_END, ({ deltaTime, generatedChunks, timeToGenerateChunks, maxTimeToGenerateChunks }) => {
   if (Application.DEBUG_MODE) {
     const DEBUG_CONTAINER = Application.UIManager.getElement(DebugHelper.DEBUG_HELPER_MENU_ID);
-    let WORLD_GENERATION_PROFILER_CONTAINER = DEBUG_CONTAINER.getElement("GENProfilerContainer");
+    let UPS_PROFILER_CONTAINER = DEBUG_CONTAINER.getElement("UPSProfilerContainer");
 
-    if (!WORLD_GENERATION_PROFILER_CONTAINER) {
-      WORLD_GENERATION_PROFILER_CONTAINER = DEBUG_CONTAINER.addElement("GENProfilerContainer", new UIContainer({
+    if (!UPS_PROFILER_CONTAINER) {
+      UPS_PROFILER_CONTAINER = DEBUG_CONTAINER.addElement("UPSProfilerContainer", new UIContainer({
         manager: Application.UIManager,
         pos: [0, 0],
         isActive: true,
         isRender: true,
-        name: "UPD Profiler"
+        name: "UPS Profiler"
       }))
-    }
 
-    WORLD_GENERATION_PROFILER_CONTAINER.clearElements();
-    Application.Profilers.UPS_PROFILER.getTasks().forEach((task, id) => {
-      WORLD_GENERATION_PROFILER_CONTAINER.addElement(`GENDataLabel${id}`, new UILabel({
+      UPS_PROFILER_CONTAINER.addElement(`deltaTimeLabel`, new UILabel({
         manager: Application.UIManager,
         isRender: true,
-        text: `[${DebugHelper.getDate()}] ${task.name}: ${task.time}ms`
+        text: `DeltaTime: ${deltaTime}ms`
       }))
-    })
 
-    Application.Profilers.WORLD_GENERATION_PROFILER.clear();
+      UPS_PROFILER_CONTAINER.addElement(`generatedChunksLabel`, new UILabel({
+        manager: Application.UIManager,
+        isRender: true,
+        text: `Generated chunks: ${generatedChunks}`
+      }))
+
+      UPS_PROFILER_CONTAINER.addElement(`timeToGenerateLabel`, new UILabel({
+        manager: Application.UIManager,
+        isRender: true,
+        text: `Time: ${timeToGenerateChunks}ms/${maxTimeToGenerateChunks}ms`
+      }))
+
+      
+
+      DebugHelper.CACHE["update"] = {
+        deltaTimeValues: [],
+        generatedChunksValues: [],
+        timeToGenerateChunksValues: [],
+        max: 50
+      };
+      return;
+    }
+
+    let cache = DebugHelper.CACHE["update"];
+
+    cache.deltaTimeValues.unshift(deltaTime);
+    if (cache.deltaTimeValues.length > cache.max) {
+      cache.deltaTimeValues.splice(cache.deltaTimeValues.length - 1, 1);
+    }
+    let deltaTimeRound = 0;
+    cache.deltaTimeValues.forEach((deltaTimeItem) => {
+      deltaTimeRound += deltaTimeItem;
+    })
+    deltaTimeRound = Math.round(deltaTimeRound / cache.deltaTimeValues.length);
+
+    cache.generatedChunksValues.unshift(generatedChunks);
+    if (cache.generatedChunksValues.length > cache.max) {
+      cache.generatedChunksValues.splice(cache.generatedChunksValues.length - 1, 1);
+    }
+    let generatedChunksRound = 0;
+    cache.generatedChunksValues.forEach((generatedChunksItem) => {
+      generatedChunksRound += generatedChunksItem;
+    })
+    generatedChunksRound = Math.round(generatedChunksRound / cache.generatedChunksValues.length * 100) / 100;
+
+    cache.timeToGenerateChunksValues.unshift(timeToGenerateChunks);
+    if (cache.timeToGenerateChunksValues.length > cache.max) {
+      cache.timeToGenerateChunksValues.splice(cache.timeToGenerateChunksValues.length - 1, 1);
+    }
+    let timeToGenerateChunksRound = 0;
+    cache.timeToGenerateChunksValues.forEach((timeToGeneratedChunksItem) => {
+      timeToGenerateChunksRound += timeToGeneratedChunksItem;
+    })
+    timeToGenerateChunksRound = Math.round(timeToGenerateChunksRound / cache.timeToGenerateChunksValues.length);
+
+    UPS_PROFILER_CONTAINER.getElement(`deltaTimeLabel`).setValue(`DeltaTime: ${deltaTimeRound}ms`)
+    UPS_PROFILER_CONTAINER.getElement(`generatedChunksLabel`).setValue(`Generated chunks: ${generatedChunksRound}`)
+    UPS_PROFILER_CONTAINER.getElement(`timeToGenerateLabel`).setValue(`Time: ${timeToGenerateChunks}ms/${maxTimeToGenerateChunks}ms`)
   }
 })

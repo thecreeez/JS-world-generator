@@ -32,16 +32,6 @@ class DebugMenuUI {
       text: `Chunks rendered: `
     }))
 
-    container.addElement("MoveButton", new UIButton({
-      manager: Application.UIManager,
-      text: "test",
-      isActive: true,
-      isRender: true,
-      onClick: (elem, pos) => {
-        
-      }
-    }))
-
     return container;
   }
 }

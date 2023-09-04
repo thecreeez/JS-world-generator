@@ -120,14 +120,14 @@ class Application {
     }
 
     this.EventBus.invoke(EventBus.TYPES.RENDER_UI_START, {});
-    Application.UIManager.update();
-    Application.UIManager.render();
-    this.EventBus.invoke(EventBus.TYPES.RENDER_UI_END, {});
-
     if (Application._currentLogoTime > 0) {
       this.renderLogo();
       Application._currentLogoTime -= deltaTime;
     }
+
+    Application.UIManager.update();
+    Application.UIManager.render();
+    this.EventBus.invoke(EventBus.TYPES.RENDER_UI_END, {});
 
     this.EventBus.invoke(EventBus.TYPES.RENDER_FRAME_END, {});
   }

@@ -13,7 +13,7 @@ class Chunk {
     this.height = height;
     this.biome = biome;
 
-    this.animationTime = 1000;
+    this.animationTime = 300 / (Application.World.camera.getSpeed() != 0 ? Application.World.camera.getSpeed() : 1);
     this.currentAnimationTime = this.animationTime;
   }
 

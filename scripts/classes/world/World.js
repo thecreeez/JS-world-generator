@@ -1,5 +1,5 @@
 class World {
-  static ChunkSize = [50, 50]
+  static ChunkSize = [30, 30]
 
   static States = {
     INIT: "init",
@@ -17,7 +17,7 @@ class World {
     this._chunks = new Map();
 
     this._state = World.States.INIT;
-    this._backgroundColor = [0,0,0]
+    this._backgroundColor = [255,255,255]
   }
 
   getBlockType(biome, height) {
@@ -113,29 +113,34 @@ class World {
   }
 
   update(deltaTime) {
+    Application.EventBus.invoke(EventBus.TYPES.UPDATE_START, {deltaTime})
     let chunksToGenerate = this.getChunksToGenerate();
+
+    let generatedChunks = 0;
+    let timeToGenerateChunks = 0;
+    let maxTimeToGenerateChunks = Math.floor(1000 / Application.MAX_TICKS);
 
     if (chunksToGenerate.length > 0) {
       let startTime = Date.now();
       let currentTime = Date.now();
-      let chunks = 0;
 
-      while (chunksToGenerate.length > 0 && currentTime - startTime < 1000 / Application.MAX_TICKS / 2) {
+      while (chunksToGenerate.length > 0 && currentTime - startTime < maxTimeToGenerateChunks) {
         let chunkData = chunksToGenerate[0];
 
         this.setChunk(chunkData.x, chunkData.y, WorldGenerator.generateChunk(this, chunkData.x, chunkData.y, this.getAdjacentChunks(chunkData.x, chunkData.y)))
 
-        if (Application.DEBUG_MODE) {
-          Application.UIManager.getElement(DebugHelper.DEBUG_HELPER_MENU_ID).getElement("ChunksUpdateLabel").setValue(`Chunks stored: ${this.getChunksCount()} (${this.getChunksCount() * World.ChunkSize[0] * World.ChunkSize[1]} blocks)`)
-        }
-
         chunksToGenerate.splice(0, 1);
-        chunks++;
+        generatedChunks++;
         currentTime = Date.now();
       }
 
-      console.log("Time to generate: " + (currentTime - startTime) + " Max: " + Math.floor(1000 / Application.MAX_TICKS / 2) +" Chunks: "+chunks);
+      if (Application.DEBUG_MODE) {
+        Application.UIManager.getElement(DebugHelper.DEBUG_HELPER_MENU_ID).getElement("ChunksUpdateLabel").setValue(`Chunks stored: ${this.getChunksCount()} (${this.getChunksCount() * World.ChunkSize[0] * World.ChunkSize[1]} blocks)`)
+      }
+
+      timeToGenerateChunks = currentTime - startTime;
     }
+    Application.EventBus.invoke(EventBus.TYPES.UPDATE_END, { deltaTime, generatedChunks, timeToGenerateChunks, maxTimeToGenerateChunks, })
   }
 
   getAdjacentChunks(x, y) {

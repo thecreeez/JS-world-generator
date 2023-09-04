@@ -7,6 +7,8 @@ class DebugHelper {
 
   static DEBUG_HELPER_MENU_ID = "DebugMenu";
 
+  static CACHE = {};
+
   static update() {
     DebugHelper._UPS_ON_THIS_SECOND++;
   }

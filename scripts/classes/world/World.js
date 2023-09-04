@@ -1,5 +1,5 @@
 class World {
-  static ChunkSize = [20, 20]
+  static ChunkSize = [50, 50]
 
   static States = {
     INIT: "init",
@@ -17,6 +17,7 @@ class World {
     this._chunks = new Map();
 
     this._state = World.States.INIT;
+    this._backgroundColor = [0,0,0]
   }
 
   getBlockType(biome, height) {
@@ -89,9 +90,15 @@ class World {
             ctx.fillRect(x * chunkSize, y * chunkSize, chunkSize, chunkSize);
           }
 
-          if (renderChunk.animationTime > 0) {
-            ctx.fillStyle = `rgba(255,255,255,${renderChunk.currentAnimationTime / renderChunk.animationTime})`;
-            ctx.fillRect(x * chunkSize, y * chunkSize, chunkSize, chunkSize);
+          let chunkFogAlpha = (MathHelper.getVectorLength([x - camera.getPos()[0] / World.ChunkSize[0], y - camera.getPos()[1] / World.ChunkSize[1]]) / (camera._distanceToRender));
+
+          if (renderChunk.currentAnimationTime > 0) {
+            chunkFogAlpha += renderChunk.currentAnimationTime / renderChunk.animationTime;
+          }
+
+          if (chunkFogAlpha > 0) {
+            ctx.fillStyle = `rgba(${this.getBackgroundColor()[0]},${this.getBackgroundColor()[1]},${this.getBackgroundColor()[2]},${chunkFogAlpha})`;
+            ctx.fillRect(x * chunkSize - 1, y * chunkSize - 1, chunkSize + 2, chunkSize + 2);
           }
         }
       } 
@@ -208,5 +215,9 @@ class World {
 
   getSeed() {
     return this._seed;
+  }
+
+  getBackgroundColor() {
+    return this._backgroundColor;
   }
 }

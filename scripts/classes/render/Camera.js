@@ -4,8 +4,8 @@ class Camera {
     this._fov = 0.3;
     this._chunkDefaultSize = 400;
 
-    this._distanceToRender = 40;
-    this._distanceToGenerate = 4;
+    this._distanceToRender = 10;
+    this._distanceToGenerate = 10;
 
     this._speed = World.ChunkSize[0] / 10;
   }

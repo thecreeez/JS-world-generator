@@ -46,4 +46,8 @@ class MathHelper {
 
     return localPos;
   }
+
+  static getVectorLength(pos) {
+    return Math.sqrt(Math.pow(pos[0], 2) + Math.pow(pos[1], 2));
+  }
 }

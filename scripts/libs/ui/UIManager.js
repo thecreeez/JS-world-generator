@@ -55,6 +55,8 @@ class UIManager {
   }
 
   render() {
+    ctx.textAlign = "left";
+    ctx.textBaseline = "alphabetic";
     for (let element of this._elements) {
       element[1].render({
         ctx: this._ctx

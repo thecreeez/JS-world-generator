@@ -10,6 +10,10 @@ class Application {
 
   static MAX_CHANGE_BLOCKS_PER_COMMAND = 100000;
 
+  static _logoTime = 300;
+  static _keyToLogoStartsDissapear = 30;
+  static _currentLogoTime = Application._logoTime;
+
   static mousePos = [0,0]
 
   static RandomTypes = {
@@ -92,6 +96,10 @@ class Application {
 
     if (Application.World) {
       this.EventBus.invoke(EventBus.TYPES.RENDER_WORLD_START, {});
+      let backColor = Application.World.getBackgroundColor();
+      ctx.fillStyle = `rgb(${backColor[0]},${backColor[1]},${backColor[2]})`
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+
       Application.World.render();
       this.EventBus.invoke(EventBus.TYPES.RENDER_WORLD_END, {});
     }
@@ -101,6 +109,11 @@ class Application {
     Application.UIManager.render();
     this.EventBus.invoke(EventBus.TYPES.RENDER_UI_END, {});
 
+    if (Application._currentLogoTime > 0) {
+      this.renderLogo();
+      Application._currentLogoTime--;
+    }
+
     this.EventBus.invoke(EventBus.TYPES.RENDER_FRAME_END, {});
   }
 
@@ -109,5 +122,16 @@ class Application {
       Application.World.update();
 
     DebugHelper.update();
+  }
+
+  static renderLogo() {
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle"
+    ctx.font = "40px arial"
+
+    let text = "[thecreeez generation]";
+
+    ctx.fillStyle = `rgba(255,255,255,${Application._currentLogoTime / Application._keyToLogoStartsDissapear})`;
+    ctx.fillText(text, canvas.width / 2, canvas.height / 2);
   }
 }

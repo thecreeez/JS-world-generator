@@ -16,8 +16,6 @@ window.onload = () => {
     ticksPerSecond: 30,
     fpsMax: 144
   });
-
-  let world = new World();
 }
 
 function fill(x1, y1, x2, y2, blockType) {

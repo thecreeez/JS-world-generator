@@ -79,6 +79,6 @@ Application.EventBus.subscribe(EventBus.TYPES.UPDATE_END, ({ deltaTime, generate
 
     UPS_PROFILER_CONTAINER.getElement(`deltaTimeLabel`).setValue(`DeltaTime: ${deltaTimeRound}ms`)
     UPS_PROFILER_CONTAINER.getElement(`generatedChunksLabel`).setValue(`Generated chunks: ${generatedChunksRound}`)
-    UPS_PROFILER_CONTAINER.getElement(`timeToGenerateLabel`).setValue(`Time: ${timeToGenerateChunks}ms/${maxTimeToGenerateChunks}ms`)
+    UPS_PROFILER_CONTAINER.getElement(`timeToGenerateLabel`).setValue(`Time: ${timeToGenerateChunksRound}ms/${maxTimeToGenerateChunks}ms`)
   }
 })

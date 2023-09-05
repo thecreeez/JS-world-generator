@@ -101,6 +101,8 @@ class PerlinNoiseGenerator {
         arr[y][x] = MathHelper.interpolate(arr[y][x], prevLeft, step);
         arr[y][x] = MathHelper.interpolate(arr[y][x], nextBot, step);
         arr[y][x] = MathHelper.interpolate(arr[y][x], nextRight, step);
+
+        //arr[y][x] = Math.round(arr[y][x] * 10000) / 10000;
       }
     }
   }

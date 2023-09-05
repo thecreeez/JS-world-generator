@@ -48,7 +48,7 @@ class Camera {
   }
 
   getPos() {
-    return this._pos;
+    return [Math.floor(this._pos[0] * 100) / 100, Math.floor(this._pos[1] * 100) / 100];
   }
 
   getDistanceToRender() {

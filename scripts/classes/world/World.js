@@ -1,5 +1,5 @@
 class World {
-  static ChunkSize = [30, 30]
+  static ChunkSize = [16, 16]
 
   static States = {
     INIT: "init",
@@ -8,8 +8,7 @@ class World {
     IDLE: "idle"
   }
 
-  constructor({ size = World.DefaultSize, perlinSettings, seed = MathHelper.randomSeed() } = {}) {
-    this._size = size;
+  constructor({ perlinSettings, seed = MathHelper.randomSeed() } = {}) {
     this._perlinSettings = perlinSettings;
     this._seed = seed;
     this.camera = new Camera();
@@ -107,7 +106,7 @@ class World {
     }
 
     if (Application.DEBUG_MODE) {
-      Application.UIManager.getElement(DebugHelper.DEBUG_HELPER_MENU_ID).getElement("ChunksRenderLabel").setValue(`Chunks rendered: ${chunksToRender}`)
+      Application.UIManager.getElement(DebugHelper.DEBUG_HELPER_MENU_ID).getElement("ChunksRenderLabel").setValue(`Chunks rendered: ${chunksToRender} (${chunksToRender * World.ChunkSize[0] * World.ChunkSize[1]} blocks)`)
     }
     ctx.restore();
   }
@@ -172,38 +171,14 @@ class World {
     let cameraChunkPos = camera.getChunkPos();
     let cameraDistanceToRender = camera.getDistanceToGenerate();
 
-    if (!this.getChunk(cameraChunkPos[0], cameraChunkPos[1])) {
-      chunksToGenerate.push({ x: cameraChunkPos[0], y: cameraChunkPos[1]})
-    }
-
-    /**
-     * ПЕРЕДЕЛАТЬ ЧТОБ ТИПА ЧЕТНЫЕ ПОЗИТИВНЫЕ НЕЧЕТНЫЕ НЕГАТИВНЫЕ НУ ТЫ ПОНЯЛ
-     */
-
-    for (let xNegative = 0; xNegative > -cameraDistanceToRender; xNegative--) {
-      for (let yNegative = 0; yNegative > -cameraDistanceToRender; yNegative--) {
-        if (!this.getChunk(cameraChunkPos[0] + xNegative, cameraChunkPos[1] + yNegative) && !(xNegative == 0 && yNegative == 0)) {
-          chunksToGenerate.push({ x: cameraChunkPos[0] + xNegative, y: cameraChunkPos[1] + yNegative })
-        }
-      }
-
-      for (let yPositive = 0; yPositive < cameraDistanceToRender; yPositive++) {
-        if (!this.getChunk(cameraChunkPos[0] + xNegative, cameraChunkPos[1] + yPositive) && !(xNegative == 0 && yPositive == 0)) {
-          chunksToGenerate.push({ x: cameraChunkPos[0] + xNegative, y: cameraChunkPos[1] + yPositive })
-        }
-      }
-    }
-
-    for (let xPositive = 0; xPositive < cameraDistanceToRender; xPositive++) {
-      for (let yNegative = 0; yNegative > -cameraDistanceToRender; yNegative--) {
-        if (!this.getChunk(cameraChunkPos[0] + xPositive, cameraChunkPos[1] + yNegative) && !(xPositive == 0 && yNegative == 0)) {
-          chunksToGenerate.push({ x: cameraChunkPos[0] + xPositive, y: cameraChunkPos[1] + yNegative })
-        }
-      }
-
-      for (let yPositive = 0; yPositive < cameraDistanceToRender; yPositive++) {
-        if (!this.getChunk(cameraChunkPos[0] + xPositive, cameraChunkPos[1] + yPositive) && !(xPositive == 0 && yPositive == 0)) {
-          chunksToGenerate.push({ x: cameraChunkPos[0] + xPositive, y: cameraChunkPos[1] + yPositive })
+    for (let currentDistance = 0; currentDistance < cameraDistanceToRender; currentDistance++) {
+      for (let x = -currentDistance; x <= currentDistance; x++) {
+        for (let y = -currentDistance; y <= currentDistance; y++) {
+          if (Math.abs(x) == currentDistance || Math.abs(y) == currentDistance) {
+            if (!this.getChunk(cameraChunkPos[0] + x, cameraChunkPos[1] + y)) {
+              chunksToGenerate.push({ x: cameraChunkPos[0] + x, y: cameraChunkPos[1] + y })
+            }
+          }
         }
       }
     }

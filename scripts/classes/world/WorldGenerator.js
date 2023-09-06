@@ -5,20 +5,6 @@ class WorldGenerator {
   static HEIGHT_NOISE_TIMES = 10;
   static HEIGHT_NOISE_STEP = 0.6  
 
-  static init(world) {
-    world._chunks = [];
-    world._noises = {};
-
-    world.setState(World.States.GENERATING);
-  }
-
-  static generate(world) {
-    if (!world._chunks) {
-      console.error("world.WorldGeneratorCache isnt exist.")
-      world.setState(World.States.INIT);
-    }
-  }
-
   static generateChunk(world, x, y, {leftChunk, rightChunk, topChunk, bottomChunk}) {
     let biomeNoise = PerlinNoiseGenerator.noise({
       size: World.ChunkSize,

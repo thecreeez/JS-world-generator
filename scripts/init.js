@@ -19,6 +19,8 @@ window.onload = () => {
 }
 
 /**
+ * Fill blocks in range to blockType
+ * 
  * Example: fill(-100, 100, -100, 100, BlockTypes.ONLY_RED)
  * @param {Integer} x1 
  * @param {Integer} y1 
@@ -50,6 +52,8 @@ function fill(x1, y1, x2, y2, blockType) {
 }
 
 /**
+ * Fills blocks in [x1,x2] size to blockType with function
+ * 
  * Example: fillByFunction((x) => Math.sin(x / 5) * 5, -100, 100, BlockTypes.ONLY_RED)
  * @param {Function} func 
  * @param {Integer} x1 

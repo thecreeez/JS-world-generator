@@ -1,7 +1,50 @@
 class BiomeTypes {
+  static ICE_LAKE = {
+    name: "ice_lake",
+    height: -0.75,
+    rgb: [0,60,0],
+    blocks: {
+      ICE: {
+        blockType: new Block({ red: 111, green: 167, blue: 199 }),
+        height: 1,
+        name: "ice"
+      }
+    }
+  }
+
+  static ICE_LAND = {
+    name: "ice_land",
+    height: -0.3,
+    blocks: {
+      SNOW: {
+        blockType: new Block({ red: 201, green: 201, blue: 201 }),
+        height: 0,
+        name: "snow"
+      },
+
+      MOUNTAIN: {
+        blockType: BlockTypes.MOUNTAIN,
+        height: 0.3,
+        name: "hills"
+      },
+
+      SNOW_MOUNTAIN: {
+        blockType: BlockTypes.SNOW_MOUNTAIN,
+        height: 0.6,
+        name: "snow_hills"
+      }
+
+      //GRASS: {
+      //  blockType: new Block({ red: 112, green: 47, blue: 0 }),
+      //  height: 1,
+      //  name: "grass"
+      //}
+    }
+  }
+
   static OCEAN = {
     name: "ocean",
-    height: 0,
+    height: 0.2,
     rgb: [35, 119, 181],
     blocks: {
       DEEP_OCEAN: {
@@ -20,7 +63,7 @@ class BiomeTypes {
 
   static DEFAULT = {
     name: "Default",
-    height: 0.15,
+    height: 0.65,
     rgb: [67, 179, 2],
     blocks: {
       DEEP_OCEAN: {

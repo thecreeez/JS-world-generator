@@ -1,12 +1,5 @@
 class World {
-  static ChunkSize = [16, 16]
-
-  static States = {
-    INIT: "init",
-    GENERATING: "generating",
-    MESHING: "meshing",
-    IDLE: "idle"
-  }
+  static ChunkSize = [20, 20]
 
   constructor({ perlinSettings, seed = MathHelper.randomSeed() } = {}) {
     this._perlinSettings = perlinSettings;
@@ -14,11 +7,15 @@ class World {
     this.camera = new Camera();
 
     this._chunks = new Map();
-
-    this._state = World.States.INIT;
     this._backgroundColor = [255,255,255]
   }
 
+  /**
+   * 
+   * @param {Biome} biome 
+   * @param {Number} height 
+   * @returns {Block} Block with needed height for specified biome
+   */
   getBlockType(biome, height) {
     let biomeBlock = this._getMaxHeightBlock(biome);
 
@@ -31,41 +28,86 @@ class World {
     return biomeBlock.blockType;
   }
 
-  _getMaxHeightBlock(biome) {
-    let max = biome.blocks[Object.keys(biome.blocks)[0]];
-
-    Object.keys(biome.blocks).forEach((blockName) => {
-      if (max.height < biome.blocks[blockName].height) {
-        max = biome.blocks[blockName]
-      }
-    })
-
-    return max;
-  }
-
-  getBiome(blockValue) {
+  /**
+   * Returns Biome from BiomeTypes
+   * @param {Number} biomeValue 
+   * @returns {Biome} Biome
+   */
+  getBiome(biomeValue) {
     let currentBiome = this._getMaxHeightBiome();
 
     for (let biomeName in BiomeTypes) {
-      if (blockValue < BiomeTypes[biomeName].height && BiomeTypes[biomeName].height < currentBiome.height)
+      if (biomeValue < BiomeTypes[biomeName].height && BiomeTypes[biomeName].height < currentBiome.height)
         currentBiome = BiomeTypes[biomeName];
     }
 
     return currentBiome;
   }
 
-  _getMaxHeightBiome() {
-    let max = BiomeTypes[Object.keys(BiomeTypes)[0]];
-
-    Object.keys(BiomeTypes).forEach((biomeName) => {
-      if (max.height < BiomeTypes[biomeName].height) {
-        max = BiomeTypes[biomeName]
-      }
-    })
-
-    return max;
+  /**
+   * 
+   * @param {ChunkPosition} x 
+   * @param {ChunkPosition} y 
+   * @returns 
+   */
+  getChunk(x, y) {
+    return this._chunks.get(`${x}:${y}`);
   }
 
+  /**
+   * 
+   * @param {ChunkPosition} x 
+   * @param {ChunkPosition} y 
+   * @param {Chunk} chunk
+   */
+  setChunk(x, y, chunk) {
+    this._chunks.set(`${x}:${y}`, chunk);
+  }
+
+  /**
+   * 
+   * @param {GlobalPosition} x 
+   * @param {GlobalPosition} y 
+   * @param {Block} blockType 
+   * @returns {Boolean} true if block successfully placed or false is not
+   */
+  setBlock(x, y, blockType) {
+    let chunkPos = MathHelper.globalToChunkPos([x,y]);
+    let blockLocalPos = MathHelper.globalToChunkLocalPos([x,y]);
+
+    let chunk = this.getChunk(chunkPos[0], chunkPos[1]);
+
+    if (chunk) {
+      chunk.setBlock(blockLocalPos[0], blockLocalPos[1], blockType);
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * 
+   * @param {GlobalPosition} x 
+   * @param {GlobalPosition} y 
+   * @returns {Block} Block from position or null if chunk is not generated yet.
+   */
+  getBlock(x, y) {
+    let chunkPos = MathHelper.globalToChunkPos([x, y]);
+    let blockLocalPos = MathHelper.globalToChunkLocalPos([x, y]);
+
+    let chunk = this.getChunk(chunkPos[0], chunkPos[1]);
+
+    if (!chunk) {
+      return null;
+    }
+
+    return chunk.getBlock(blockLocalPos[0], blockLocalPos[1]);
+  }
+
+  /**
+   * Render world
+   * @param {Number} deltaTime 
+   */
   render(deltaTime) {
     let camera = this.camera;
     let chunkSize = camera.getChunkSizeOnScreen();
@@ -102,7 +144,7 @@ class World {
             ctx.fillRect(x * chunkSize - 1, y * chunkSize - 1, chunkSize + 2, chunkSize + 2);
           }
         }
-      } 
+      }
     }
 
     if (Application.DEBUG_MODE) {
@@ -111,9 +153,25 @@ class World {
     ctx.restore();
   }
 
+  /**
+   * Updates world
+   * @param {Number} deltaTime 
+   */
   update(deltaTime) {
-    Application.EventBus.invoke(EventBus.TYPES.UPDATE_START, {deltaTime})
-    let chunksToGenerate = this.getChunksToGenerate();
+    Application.EventBus.invoke(EventBus.TYPES.UPDATE_START, { deltaTime })
+    let chunkGenerationData = this._updateChunksGeneration(deltaTime);
+
+    // Переделать эту тему / Переназвать ивент
+    Application.EventBus.invoke(EventBus.TYPES.UPDATE_END, chunkGenerationData)
+  }
+
+  /**
+   * Generates new chunks
+   * @param {Number} deltaTime 
+   * @returns Debug data (Need to fix it)
+   */
+  _updateChunksGeneration(deltaTime) {
+    let chunksToGenerate = this._getChunksToGenerate();
 
     let generatedChunks = 0;
     let timeToGenerateChunks = 0;
@@ -139,14 +197,45 @@ class World {
 
       timeToGenerateChunks = currentTime - startTime;
     }
-    Application.EventBus.invoke(EventBus.TYPES.UPDATE_END, { deltaTime, generatedChunks, timeToGenerateChunks, maxTimeToGenerateChunks, })
+
+    return { deltaTime, generatedChunks, timeToGenerateChunks, maxTimeToGenerateChunks };
   }
 
+  _getMaxHeightBiome() {
+    let max = BiomeTypes[Object.keys(BiomeTypes)[0]];
+
+    Object.keys(BiomeTypes).forEach((biomeName) => {
+      if (max.height < BiomeTypes[biomeName].height) {
+        max = BiomeTypes[biomeName]
+      }
+    })
+
+    return max;
+  }
+
+  _getMaxHeightBlock(biome) {
+    let max = biome.blocks[Object.keys(biome.blocks)[0]];
+
+    Object.keys(biome.blocks).forEach((blockName) => {
+      if (max.height < biome.blocks[blockName].height) {
+        max = biome.blocks[blockName]
+      }
+    })
+
+    return max;
+  }
+
+  /**
+   * 
+   * @param {ChunkPosition} x 
+   * @param {ChunkPosition} y 
+   * @returns Chunks adjacent to selected chunk (If chunk not generated it will be undefined)
+   */
   getAdjacentChunks(x, y) {
     return {
       leftChunk: this.getChunk(x - 1, y),
       rightChunk: this.getChunk(x + 1, y),
-      topChunk: this.getChunk(x, y - 1), 
+      topChunk: this.getChunk(x, y - 1),
       bottomChunk: this.getChunk(x, y + 1),
     };
   }
@@ -163,7 +252,7 @@ class World {
     }
   }
 
-  getChunksToGenerate() {
+  _getChunksToGenerate() {
     let camera = this.camera;
 
     let chunksToGenerate = [];
@@ -186,31 +275,15 @@ class World {
     return chunksToGenerate;
   }
 
-  getChunksCount() {
-    return this._chunks.size;
-  }
-
-  getChunk(x, y) {
-    return this._chunks.get(`${x}:${y}`);
-  }
-
-  setChunk(x, y, chunk) {
-    //console.log("new chunk: "+x+","+y)
-    return this._chunks.set(`${x}:${y}`, chunk);
-  }
-
-  setState(state) {
-    this._state = state;
-  }
-  getState() {
-    return this._state;
-  }
-
   getSeed() {
     return this._seed;
   }
 
   getBackgroundColor() {
     return this._backgroundColor;
+  }
+
+  getChunksCount() {
+    return this._chunks.size;
   }
 }

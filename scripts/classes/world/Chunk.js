@@ -1,5 +1,5 @@
 class Chunk {
-  constructor(x, y, { biome, height }) {
+  constructor(x, y, { height, biome, temperature }) {
     this._x = x;
     this._y = y;
 
@@ -11,7 +11,9 @@ class Chunk {
     this._canvas.height = World.ChunkSize[1] * Application.TEXTURE_SIZE;
 
     this.height = height;
+
     this.biome = biome;
+    this.temperature = temperature;
 
     this.animationTime = 500 / (Application.World.camera.getSpeed() != 0 ? Application.World.camera.getSpeed() : 1);
     this.currentAnimationTime = this.animationTime;
@@ -93,5 +95,13 @@ class Chunk {
     }
 
     return this._canvas;
+  }
+
+  getTemperature() {
+    return this.temperature;
+  }
+
+  getBiome() {
+    return this.biome;
   }
 }

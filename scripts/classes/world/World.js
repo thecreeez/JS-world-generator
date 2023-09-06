@@ -1,5 +1,5 @@
 class World {
-  static ChunkSize = [20, 20]
+  static ChunkSize = [16, 16]
 
   constructor({ perlinSettings, seed = MathHelper.randomSeed() } = {}) {
     this._perlinSettings = perlinSettings;
@@ -16,16 +16,23 @@ class World {
    * @param {Number} height 
    * @returns {Block} Block with needed height for specified biome
    */
-  getBlockType(biome, height) {
-    let biomeBlock = this._getMaxHeightBlock(biome);
+  getBlockType(biome, weight) {
+    let biomeBlockType = null;
 
-    for (let candidateBlockId in biome.blocks) {
-      if (height < biome.blocks[candidateBlockId].height && biome.blocks[candidateBlockId].height < biomeBlock.height) {
-        biomeBlock = biome.blocks[candidateBlockId]
+    let blockCandidateValue = 0;
+    biome.blocks.forEach((blockCandidate) => {
+      blockCandidateValue += blockCandidate.weight;
+
+      if (!biomeBlockType && weight < blockCandidateValue) {
+        biomeBlockType = blockCandidate;
       }
+    })
+
+    if (!biomeBlockType) {
+      return BlockTypes.DEFAULT;
     }
 
-    return biomeBlock.blockType;
+    return biomeBlockType.blockType;
   }
 
   /**
@@ -34,12 +41,16 @@ class World {
    * @returns {Biome} Biome
    */
   getBiome(biomeValue) {
-    let currentBiome = this._getMaxHeightBiome();
+    let currentBiome = null;
+    
+    let biomeCandidateValue = 0;
+    BiomeTypes.DEFAULT_BIOMES.forEach((biomeCandidate) => {
+      biomeCandidateValue += biomeCandidate.weight;
 
-    for (let biomeName in BiomeTypes) {
-      if (biomeValue < BiomeTypes[biomeName].height && BiomeTypes[biomeName].height < currentBiome.height)
-        currentBiome = BiomeTypes[biomeName];
-    }
+      if (!currentBiome && biomeValue < biomeCandidateValue) {
+        currentBiome = biomeCandidate
+      }
+    })
 
     return currentBiome;
   }
@@ -104,6 +115,50 @@ class World {
     return chunk.getBlock(blockLocalPos[0], blockLocalPos[1]);
   }
 
+  getBiomeBounds() {
+    return [0, this.getBoundsHeightBiome().max];
+  }
+
+  getHeightBounds(biome) {
+    return [0, this.getBoundsHeightBlock(biome).max]
+  }
+
+  /**
+   * @returns {Object} { min, max } values of biome heights
+   */
+  getBoundsHeightBiome() {
+    let min = 0;
+    let max = 0;
+
+    BiomeTypes.DEFAULT_BIOMES.forEach((biome) => {
+      max += biome.weight;
+    })
+
+    return {
+      max,
+      min
+    };
+  }
+
+  /**
+   * 
+   * @param {Biome} biome 
+   * @returns {Object} { min, max } values of biome blocks heights
+   */
+  getBoundsHeightBlock(biome) {
+    let min = 0;
+    let max = 0;
+
+    biome.blocks.forEach((block) => {
+      max += block.weight;
+    })
+
+    return {
+      max,
+      min
+    };
+  }
+
   /**
    * Render world
    * @param {Number} deltaTime 
@@ -139,10 +194,10 @@ class World {
             renderChunk.currentAnimationTime -= deltaTime;
           }
 
-          if (chunkFogAlpha > 0) {
-            ctx.fillStyle = `rgba(${this.getBackgroundColor()[0]},${this.getBackgroundColor()[1]},${this.getBackgroundColor()[2]},${chunkFogAlpha})`;
-            ctx.fillRect(x * chunkSize - 1, y * chunkSize - 1, chunkSize + 2, chunkSize + 2);
-          }
+          //if (chunkFogAlpha > 0) {
+          //  ctx.fillStyle = `rgba(${this.getBackgroundColor()[0]},${this.getBackgroundColor()[1]},${this.getBackgroundColor()[2]},${chunkFogAlpha})`;
+          //  ctx.fillRect(x * chunkSize - 1, y * chunkSize - 1, chunkSize + 2, chunkSize + 2);
+          //}
         }
       }
     }
@@ -199,30 +254,6 @@ class World {
     }
 
     return { deltaTime, generatedChunks, timeToGenerateChunks, maxTimeToGenerateChunks };
-  }
-
-  _getMaxHeightBiome() {
-    let max = BiomeTypes[Object.keys(BiomeTypes)[0]];
-
-    Object.keys(BiomeTypes).forEach((biomeName) => {
-      if (max.height < BiomeTypes[biomeName].height) {
-        max = BiomeTypes[biomeName]
-      }
-    })
-
-    return max;
-  }
-
-  _getMaxHeightBlock(biome) {
-    let max = biome.blocks[Object.keys(biome.blocks)[0]];
-
-    Object.keys(biome.blocks).forEach((blockName) => {
-      if (max.height < biome.blocks[blockName].height) {
-        max = biome.blocks[blockName]
-      }
-    })
-
-    return max;
   }
 
   /**

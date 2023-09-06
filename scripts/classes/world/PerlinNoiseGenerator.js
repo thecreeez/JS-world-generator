@@ -1,7 +1,7 @@
 class PerlinNoiseGenerator {
-  // Мб создавать шум по чанкам
-  static noise({ size = [2, 2], times, step, seed, offset = [0, 0] }) {
-    let noiseArr = PerlinNoiseGenerator._noise({ xSize: size[0], ySize: size[1], seed, offset });
+  /* СДЕЛАТЬ MIN/MAX ЗНАЧЕНИЯ */
+  static noise({ size = [2, 2], times, step, seed, bounds = [-1, 1] }) {
+    let noiseArr = PerlinNoiseGenerator._noise({ xSize: size[0], ySize: size[1], seed, bounds });
 
     for (let i = 0; i < times; i++) {
       PerlinNoiseGenerator._interpolate(noiseArr, step);
@@ -70,7 +70,7 @@ class PerlinNoiseGenerator {
     return noise;
   }
 
-  static _noise({ xSize, ySize, seed, offset }) {
+  static _noise({ xSize, ySize, seed, offset = [0, 0], bounds = [-1, 1] }) {
     let noiseArr = [];
 
     for (let y = offset[1]; y < ySize + offset[1]; y++) {
@@ -78,7 +78,7 @@ class PerlinNoiseGenerator {
 
       for (let x = offset[0]; x < xSize + offset[0]; x++) {
         let random = MathHelper.createRandom(seed * x * y);
-        let randomNum = MathHelper.randomInt(-1, 1, random);
+        let randomNum = MathHelper.randomInt(Math.min(bounds[0], bounds[1]), Math.max(bounds[0], bounds[1]), random);
 
         noiseLine.push(randomNum);
       }

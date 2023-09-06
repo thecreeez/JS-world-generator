@@ -1,34 +1,52 @@
-class WorldGenerator {
-  static BIOME_NOISE_TIMES = 20;
-  static BIOME_NOISE_STEP = 0.4;
+/**
+ * СДЕЛАТЬ ОТДЕЛЬНО ВЫСОТУ И ТЕМПЕРАТУРУ И ПО НИМ ОПРЕДЕЛЯТЬ ЧАНК
+ */
 
-  static HEIGHT_NOISE_TIMES = 10;
-  static HEIGHT_NOISE_STEP = 0.6  
+class WorldGenerator {
+  static BIOME_SMOOTH = 0.2;
+
+  static HEIGHT_NOISE_TIMES = 4;
+  static HEIGHT_NOISE_STEP = 0.7  
 
   static generateChunk(world, x, y, {leftChunk, rightChunk, topChunk, bottomChunk}) {
-    let biomeNoise = PerlinNoiseGenerator.noise({
-      size: World.ChunkSize,
-      times: WorldGenerator.BIOME_NOISE_TIMES,
-      step: WorldGenerator.BIOME_NOISE_STEP,
-      seed: world.getSeed() * x * y
-    })
+    let random = MathHelper.createRandom(world.getSeed() * x * y);
+    let chunkTemperature = MathHelper.randomInBounds(world.getBiomeBounds()[0], world.getBiomeBounds()[1], random);
+
+    for (let i = 0; i < 10; i++) {
+      if (topChunk) {
+        chunkTemperature = MathHelper.interpolate(chunkTemperature, topChunk.getTemperature(), WorldGenerator.BIOME_SMOOTH);
+      }
+
+      if (rightChunk) {
+        chunkTemperature = MathHelper.interpolate(chunkTemperature, rightChunk.getTemperature(), WorldGenerator.BIOME_SMOOTH);
+      }
+
+      if (bottomChunk) {
+        chunkTemperature = MathHelper.interpolate(chunkTemperature, bottomChunk.getTemperature(), WorldGenerator.BIOME_SMOOTH);
+      }
+
+      if (leftChunk) {
+        chunkTemperature = MathHelper.interpolate(chunkTemperature, leftChunk.getTemperature(), WorldGenerator.BIOME_SMOOTH);
+      }
+    }
+
+    let chunkBiome = world.getBiome(chunkTemperature);
+
+    if (!chunkBiome) {
+      console.log(chunkTemperature)
+    }
 
     let heightNoise = PerlinNoiseGenerator.noise({
       size: World.ChunkSize,
       times: WorldGenerator.HEIGHT_NOISE_TIMES,
       step: WorldGenerator.HEIGHT_NOISE_STEP,
-      seed: world.getSeed() * x * y * 30
+      seed: world.getSeed() * x * y * 30,
+      bounds: world.getHeightBounds(chunkBiome)
     })
 
-    let biomeStep = 0.7;
     let heightStep = 0.4
 
     if (rightChunk) {
-      biomeNoise = PerlinNoiseGenerator.smoothNoise({
-        noise: biomeNoise,
-        rightNoise: rightChunk.biome,
-        step: biomeStep
-      })
       heightNoise = PerlinNoiseGenerator.smoothNoise({
         noise: heightNoise,
         rightNoise: rightChunk.height,
@@ -37,11 +55,6 @@ class WorldGenerator {
     }
 
     if (leftChunk) {
-      biomeNoise = PerlinNoiseGenerator.smoothNoise({
-        noise: biomeNoise,
-        leftNoise: leftChunk.biome,
-        step: biomeStep
-      })
       heightNoise = PerlinNoiseGenerator.smoothNoise({
         noise: heightNoise,
         leftNoise: leftChunk.height,
@@ -50,11 +63,6 @@ class WorldGenerator {
     }
 
     if (topChunk) {
-      biomeNoise = PerlinNoiseGenerator.smoothNoise({
-        noise: biomeNoise,
-        topNoise: topChunk.biome,
-        step: biomeStep
-      })
       heightNoise = PerlinNoiseGenerator.smoothNoise({
         noise: heightNoise,
         topNoise: topChunk.height,
@@ -63,11 +71,6 @@ class WorldGenerator {
     }
 
     if (bottomChunk) {
-      biomeNoise = PerlinNoiseGenerator.smoothNoise({
-        noise: biomeNoise,
-        bottomNoise: bottomChunk.biome,
-        step: biomeStep
-      })
       heightNoise = PerlinNoiseGenerator.smoothNoise({
         noise: heightNoise,
         bottomNoise: bottomChunk.height,
@@ -75,16 +78,14 @@ class WorldGenerator {
       })
     }
 
-    let chunk = new Chunk(x, y, { biome: biomeNoise, height: heightNoise })
+    let chunk = new Chunk(x, y, { biome: chunkBiome, temperature: chunkTemperature, height: heightNoise })
 
     for (let chunkY = 0; chunkY < World.ChunkSize[1]; chunkY++) {
       for (let chunkX = 0; chunkX < World.ChunkSize[0]; chunkX++) {
-        let biome = world.getBiome(biomeNoise[chunkY][chunkX]);
-        let blockType = world.getBlockType(biome, heightNoise[chunkY][chunkX]);
+        let blockType = world.getBlockType(chunkBiome, heightNoise[chunkY][chunkX]);
 
-        chunk.setBlock(chunkX, chunkY, new Block({ blockType, biome: biome}));
-        //chunk.setBlock(chunkX, chunkY, new Block({ red: biomeNoise[chunkY][chunkX] * 255, green: heightNoise[chunkY][chunkX] * 255, blue: biomeNoise[chunkY][chunkX] * 255 * 0 }))
-        //chunk.setBlock(chunkX, chunkY, new Block({ red: biome.rgb[0], green: biome.rgb[1], blue: biome.rgb[2] }))
+        chunk.setBlock(chunkX, chunkY, new Block({ blockType }));
+        //chunk.setBlock(chunkX, chunkY, new Block({ blockType: chunkBiome.blocks[0].blockType }))
       }
     }
 

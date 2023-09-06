@@ -7,6 +7,10 @@ class MathHelper {
     return Math.floor(random() * (max - min + 1)) + min;
   }
 
+  static randomInBounds(min, max, random) {
+    return random() * (max - min) + min;
+  }
+
   static createRandom(s) {
     if (Application.RandomMethod == Application.RandomTypes.FullRandom)
       return Math.random

@@ -50,6 +50,9 @@ class WorldGenerator {
       heightNoise = PerlinNoiseGenerator.smoothNoise({
         noise: heightNoise,
         rightNoise: rightChunk.height,
+
+        mainNoiseBounds: world.getBiomeBounds(chunkBiome),
+        secondNoiseBounds: world.getBiomeBounds(rightChunk.getBiome()),
         step: heightStep
       })
     }
@@ -58,6 +61,9 @@ class WorldGenerator {
       heightNoise = PerlinNoiseGenerator.smoothNoise({
         noise: heightNoise,
         leftNoise: leftChunk.height,
+
+        mainNoiseBounds: world.getBiomeBounds(chunkBiome),
+        secondNoiseBounds: world.getBiomeBounds(leftChunk.getBiome()),
         step: heightStep
       })
     }
@@ -66,6 +72,9 @@ class WorldGenerator {
       heightNoise = PerlinNoiseGenerator.smoothNoise({
         noise: heightNoise,
         topNoise: topChunk.height,
+
+        mainNoiseBounds: world.getBiomeBounds(chunkBiome),
+        secondNoiseBounds: world.getBiomeBounds(topChunk.getBiome()),
         step: heightStep
       })
     }
@@ -74,6 +83,9 @@ class WorldGenerator {
       heightNoise = PerlinNoiseGenerator.smoothNoise({
         noise: heightNoise,
         bottomNoise: bottomChunk.height,
+
+        mainNoiseBounds: world.getBiomeBounds(chunkBiome),
+        secondNoiseBounds: world.getBiomeBounds(bottomChunk.getBiome()),
         step: heightStep
       })
     }

@@ -11,7 +11,7 @@ class PerlinNoiseGenerator {
   }
 
   // Сглаживает разницу между шумами (берет только самый крайний и сглаживает ровно blockSmooth значений)
-  static smoothNoise({ noise, leftNoise = null, rightNoise = null, topNoise = null, bottomNoise = null, blockSmooth = 5, step}) {
+  static smoothNoise({ noise, leftNoise = null, rightNoise = null, topNoise = null, bottomNoise = null, blockSmooth = 5, step, mainNoiseBounds = [-1,1], secondNoiseBounds = [-1,1] }) {
     if (!noise) {
       console.error(`noise is not presented.`)
       return noise;
@@ -26,9 +26,9 @@ class PerlinNoiseGenerator {
       for (let y = 0; y < leftNoise.length; y++) {
         let leftNoiseValue = leftNoise[y][leftNoise[y].length - 1];
 
-        noise[y][0] = MathHelper.interpolate(noise[y][0], leftNoiseValue, step);
+        noise[y][0] = MathHelper.interpolate(noise[y][0] / mainNoiseBounds[1], leftNoiseValue / secondNoiseBounds[1], step);
         for (let i = 1; i < Math.min(blockSmooth, noise[y].length); i++) {
-          noise[y][i] = MathHelper.interpolate(noise[y][i], noise[y][i - 1], step);
+          noise[y][i] = MathHelper.interpolate(noise[y][i] / mainNoiseBounds[1], noise[y][i - 1] / secondNoiseBounds[1], step);
         }
       }
     }
@@ -37,10 +37,9 @@ class PerlinNoiseGenerator {
       for (let y = 0; y < rightNoise.length; y++) {
         let rightNoiseValue = rightNoise[y][0];
 
-        noise[y][noise[y].length - 1] = MathHelper.interpolate(noise[y][noise[y].length - 1], rightNoiseValue, step);
-        
+        noise[y][noise[y].length - 1] = MathHelper.interpolate(noise[y][noise[y].length - 1] / mainNoiseBounds[1], rightNoiseValue / secondNoiseBounds[1], step);
         for (let i = 1; i < Math.min(blockSmooth, noise[y].length); i++) {
-          noise[y][noise[y].length - 1 - i] = MathHelper.interpolate(noise[y][noise[y].length - 1 - i], noise[y][noise[y].length - i], step);
+          noise[y][noise[y].length - 1 - i] = MathHelper.interpolate(noise[y][noise[y].length - 1 - i] / mainNoiseBounds[1], noise[y][noise[y].length - i] / secondNoiseBounds[1], step);
         }
       }
     }
@@ -49,9 +48,9 @@ class PerlinNoiseGenerator {
       for (let x = 0; x < topNoise[topNoise.length - 1].length; x++) {
         let topNoiseValue = topNoise[topNoise.length - 1][x];
 
-        noise[0][x] = MathHelper.interpolate(noise[0][x], topNoiseValue, step);
+        noise[0][x] = MathHelper.interpolate(noise[0][x] / mainNoiseBounds[1], topNoiseValue / secondNoiseBounds[1], step);
         for (let i = 1; i < Math.min(blockSmooth, noise.length); i++) {
-          noise[i][x] = MathHelper.interpolate(noise[i][x], noise[i - 1][x], step);
+          noise[i][x] = MathHelper.interpolate(noise[i][x] / mainNoiseBounds[1], noise[i - 1][x] / secondNoiseBounds[1], step);
         }
       }
     }
@@ -60,9 +59,9 @@ class PerlinNoiseGenerator {
       for (let x = 0; x < bottomNoise[0].length; x++) {
         let bottomNoiseValue = bottomNoise[0][x];
 
-        noise[noise.length - 1][x] = MathHelper.interpolate(noise[noise.length - 1][x], bottomNoiseValue, step);
+        noise[noise.length - 1][x] = MathHelper.interpolate(noise[noise.length - 1][x] / mainNoiseBounds[1], bottomNoiseValue / secondNoiseBounds[1], step);
         for (let i = 1; i < Math.min(blockSmooth,noise.length); i++) {
-          noise[noise.length - 1 - i][x] = MathHelper.interpolate(noise[noise.length - 1 - i][x], noise[noise.length - i][x], step);
+          noise[noise.length - 1 - i][x] = MathHelper.interpolate(noise[noise.length - 1 - i][x] / mainNoiseBounds[1], noise[noise.length - i][x] / secondNoiseBounds[1], step);
         }
       }
     }

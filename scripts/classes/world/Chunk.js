@@ -57,7 +57,7 @@ class Chunk {
   }
 
   // Рендер чанка в контексте и особой позиции
-  bake(alpha = 0) {
+  bake({ renderType = Camera.RENDER_TYPES.DEFAULT, alpha = 0} = {}) {
     let ctx = this._canvas.getContext("2d");
 
     for (let y = 0; y < World.ChunkSize[1]; y++) {
@@ -68,7 +68,11 @@ class Chunk {
           console.error(`Что-то пошло не так: `, block);
         }
 
-        ctx.fillStyle = block.getColor();
+        switch (renderType) {
+          case Camera.RENDER_TYPES.DEFAULT: ctx.fillStyle = block.getColor(); break;
+          case Camera.RENDER_TYPES.HEIGHTS: let color = this.height[y][x] / this.getBiome().maxBlockNatural * 255; ctx.fillStyle = `rgb(${color}, ${color}, ${color})`; break;
+        }
+         
         ctx.fillRect(x * Application.TEXTURE_SIZE, y * Application.TEXTURE_SIZE, Application.TEXTURE_SIZE, Application.TEXTURE_SIZE);
       }
     }
@@ -82,12 +86,21 @@ class Chunk {
     ctx.fillStyle = `rgba(255,255,255,${alpha})`;
     ctx.fillRect(0, 0, this._canvas.width, this._canvas.height);
 
+    this._renderType = renderType;
     this._needToBake = false;
   }
 
-  getCanvas() {
+  setNeedToBake(value) {
+    this._needToBake = value;
+  }
+
+  getCanvas(renderType = Camera.RENDER_TYPES.DEFAULT) {
     if (this._needToBake) {
-      this.bake();
+      this.bake({ renderType });
+    }
+
+    if (Camera.RENDER_TYPE != this._renderType) {
+      this.bake({ renderType });
     }
 
     if (this.currentAnimationTime > 0) {

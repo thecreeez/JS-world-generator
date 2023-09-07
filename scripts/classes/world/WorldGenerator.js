@@ -3,10 +3,10 @@
  */
 
 class WorldGenerator {
-  static BIOME_SMOOTH = 0.2;
+  static BIOME_SMOOTH = 0.4;
 
-  static HEIGHT_NOISE_TIMES = 10;
-  static HEIGHT_NOISE_STEP = 0.5  
+  static HEIGHT_NOISE_TIMES = 7;
+  static HEIGHT_NOISE_STEP = 0.6
 
   /**
    * 
@@ -20,7 +20,7 @@ class WorldGenerator {
     let random = MathHelper.createRandom(world.getSeed() * x * y);
     let chunkTemperature = MathHelper.randomInBounds(world.getBiomeBounds()[0], world.getBiomeBounds()[1], random);
 
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 1; i++) {
       if (topChunk) {
         chunkTemperature = MathHelper.interpolate(chunkTemperature, topChunk.getTemperature(), WorldGenerator.BIOME_SMOOTH);
       }
@@ -42,6 +42,7 @@ class WorldGenerator {
 
     if (!chunkBiome) {
       console.log(chunkTemperature)
+      return;
     }
 
     let heightNoise = PerlinNoiseGenerator.noise({
@@ -49,7 +50,7 @@ class WorldGenerator {
       times: WorldGenerator.HEIGHT_NOISE_TIMES,
       step: WorldGenerator.HEIGHT_NOISE_STEP,
       seed: world.getSeed() * x * y * 30,
-      bounds: world.getHeightBounds(chunkBiome)
+      bounds: [chunkBiome.minBlockNatural, chunkBiome.maxBlockNatural]
     })
 
     let heightStep = 0.6;
@@ -58,7 +59,7 @@ class WorldGenerator {
       heightNoise = PerlinNoiseGenerator.smoothNoise({
         noise: heightNoise,
         rightNoise: rightChunk.height,
-        blockSmooth: 4,
+        blockSmooth: 5,
 
         mainNoiseBounds: world.getHeightBounds(chunkBiome),
         secondNoiseBounds: world.getHeightBounds(rightChunk.getBiome()),
@@ -70,7 +71,7 @@ class WorldGenerator {
       heightNoise = PerlinNoiseGenerator.smoothNoise({
         noise: heightNoise,
         leftNoise: leftChunk.height,
-        blockSmooth: 4,
+        blockSmooth: 5,
 
         mainNoiseBounds: world.getHeightBounds(chunkBiome),
         secondNoiseBounds: world.getHeightBounds(leftChunk.getBiome()),
@@ -82,7 +83,7 @@ class WorldGenerator {
       heightNoise = PerlinNoiseGenerator.smoothNoise({
         noise: heightNoise,
         topNoise: topChunk.height,
-        blockSmooth: 4,
+        blockSmooth: 5,
 
         mainNoiseBounds: world.getHeightBounds(chunkBiome),
         secondNoiseBounds: world.getHeightBounds(topChunk.getBiome()),
@@ -94,7 +95,7 @@ class WorldGenerator {
       heightNoise = PerlinNoiseGenerator.smoothNoise({
         noise: heightNoise,
         bottomNoise: bottomChunk.height,
-        blockSmooth: 4,
+        blockSmooth: 5,
 
         mainNoiseBounds: world.getHeightBounds(chunkBiome),
         secondNoiseBounds: world.getHeightBounds(bottomChunk.getBiome()),
@@ -109,7 +110,6 @@ class WorldGenerator {
         let blockType = world.getBlockType(chunkBiome, heightNoise[chunkY][chunkX]);
 
         chunk.setBlock(chunkX, chunkY, new Block({ blockType }));
-        //chunk.setBlock(chunkX, chunkY, new Block({ blockType: chunkBiome.blocks[0].blockType }))
       }
     }
 

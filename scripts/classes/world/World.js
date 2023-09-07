@@ -1,5 +1,5 @@
 class World {
-  static ChunkSize = [16, 16]
+  static ChunkSize = [30, 30]
 
   constructor({ perlinSettings, seed = MathHelper.randomSeed() } = {}) {
     this._perlinSettings = perlinSettings;
@@ -177,7 +177,7 @@ class World {
       for (let x = chunksBoundsToRender.min[0]; x < chunksBoundsToRender.max[0]; x++) {
         let renderChunk = this.getChunk(x, y);
         if (renderChunk) {
-          ctx.drawImage(renderChunk.getCanvas(), x * chunkSize, y * chunkSize, chunkSize, chunkSize);
+          ctx.drawImage(renderChunk.getCanvas(Camera.RENDER_TYPE), x * chunkSize, y * chunkSize, chunkSize, chunkSize);
 
           chunksToRender++;
           // Если чанк камеры

@@ -30,7 +30,7 @@ class PerlinNoiseGenerator {
           MathHelper.clamp(mainNoiseBounds[0], mainNoiseBounds[1], MathHelper.interpolate(noise[y][0], leftNoiseValue, step));
         for (let i = 1; i < Math.min(blockSmooth, noise[y].length); i++) {
           noise[y][i] = 
-            MathHelper.clamp(mainNoiseBounds[0], mainNoiseBounds[1], MathHelper.interpolate(noise[y][i], noise[y][i - 1], step * i));
+            MathHelper.clamp(mainNoiseBounds[0], mainNoiseBounds[1], MathHelper.interpolate(noise[y][i], leftNoiseValue, step - step * (i * 0.01)));
         }
       }
     }
@@ -43,7 +43,7 @@ class PerlinNoiseGenerator {
           MathHelper.clamp(mainNoiseBounds[0], mainNoiseBounds[1], MathHelper.interpolate(noise[y][noise[y].length - 1], rightNoiseValue, step));
         for (let i = 1; i < Math.min(blockSmooth, noise[y].length); i++) {
           noise[y][noise[y].length - 1 - i] = 
-            MathHelper.clamp(mainNoiseBounds[0], mainNoiseBounds[1], MathHelper.interpolate(noise[y][noise[y].length - 1 - i], noise[y][noise[y].length - i], step * i));
+            MathHelper.clamp(mainNoiseBounds[0], mainNoiseBounds[1], MathHelper.interpolate(noise[y][noise[y].length - 1 - i], rightNoiseValue, step - step * (i * 0.01)));
         }
       }
     }
@@ -56,7 +56,7 @@ class PerlinNoiseGenerator {
           MathHelper.clamp(mainNoiseBounds[0], mainNoiseBounds[1], MathHelper.interpolate(noise[0][x], topNoiseValue, step));
         for (let i = 1; i < Math.min(blockSmooth, noise.length); i++) {
           noise[i][x] = 
-            MathHelper.clamp(mainNoiseBounds[0], mainNoiseBounds[1], MathHelper.interpolate(noise[i][x], noise[i - 1][x], step * i));
+            MathHelper.clamp(mainNoiseBounds[0], mainNoiseBounds[1], MathHelper.interpolate(noise[i][x], topNoiseValue, step - step * (i * 0.01)));
         }
       }
     }
@@ -70,9 +70,13 @@ class PerlinNoiseGenerator {
 
         for (let i = 1; i < Math.min(blockSmooth,noise.length); i++) {
           noise[noise.length - 1 - i][x] = 
-            MathHelper.clamp(mainNoiseBounds[0], mainNoiseBounds[1], MathHelper.interpolate(noise[noise.length - 1 - i][x], noise[noise.length - i][x], step * i));
+            MathHelper.clamp(mainNoiseBounds[0], mainNoiseBounds[1], MathHelper.interpolate(noise[noise.length - 1 - i][x], bottomNoiseValue, step - step * (i * 0.01)));
         }
       }
+    }
+
+    for (let i = 0; i < 2; i++) {
+      PerlinNoiseGenerator._interpolate(noise, step);
     }
 
     return noise;
@@ -105,10 +109,13 @@ class PerlinNoiseGenerator {
         let nextBot = arr[y + 1] ? arr[y + 1][x] : arr[y][x];
         let nextRight = arr[y][x + 1] ? arr[y][x + 1] : arr[y][x];
 
-        arr[y][x] = MathHelper.interpolate(arr[y][x], prevTop, step);
-        arr[y][x] = MathHelper.interpolate(arr[y][x], prevLeft, step);
-        arr[y][x] = MathHelper.interpolate(arr[y][x], nextBot, step);
-        arr[y][x] = MathHelper.interpolate(arr[y][x], nextRight, step);
+        arr[y][x] = 
+          (
+          MathHelper.interpolate(arr[y][x], prevTop, step) + 
+          MathHelper.interpolate(arr[y][x], prevLeft, step) + 
+          MathHelper.interpolate(arr[y][x], nextBot, step) +
+          MathHelper.interpolate(arr[y][x], nextRight, step)
+          ) / 4;
 
         //arr[y][x] = Math.round(arr[y][x] * 10000) / 10000;
       }

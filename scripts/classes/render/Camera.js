@@ -1,13 +1,24 @@
 class Camera {
+  static RENDER_TYPES = {
+    DEFAULT: "default",
+    HEIGHTS: "height"
+  }
+
+  static RENDER_TYPE = this.RENDER_TYPES.DEFAULT;
+
   constructor({ pos = [0,0] } = {}) {
     this._pos = pos;
     this._fov = 1;
     this._chunkDefaultSize = 70;
 
-    this._distanceToRender = 5;
-    this._distanceToGenerate = 5;
+    this._distanceToRender = 3;
+    this._distanceToGenerate = 3;
 
     this._speed = World.ChunkSize[0] / 10;
+  }
+
+  static setRenderType(renderType) {
+    Camera.RENDER_TYPE = renderType;
   }
 
   move(pos) {

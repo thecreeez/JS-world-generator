@@ -98,6 +98,19 @@ class Application {
         case "Enter": {
           let chunkPos = Application.World.camera.getChunkPos();
           Application.World.setChunk(chunkPos[0], chunkPos[1], WorldGenerator.generateChunk(Application.World, chunkPos[0], chunkPos[1], Application.World.getAdjacentChunks(chunkPos[0], chunkPos[1])))
+
+          setTimeout(() => {
+            Application.World.setChunk(chunkPos[0] - 1, chunkPos[1], WorldGenerator.generateChunk(Application.World, chunkPos[0] - 1, chunkPos[1], Application.World.getAdjacentChunks(chunkPos[0] - 1, chunkPos[1])))
+            Application.World.setChunk(chunkPos[0] + 1, chunkPos[1], WorldGenerator.generateChunk(Application.World, chunkPos[0] + 1, chunkPos[1], Application.World.getAdjacentChunks(chunkPos[0] + 1, chunkPos[1])))
+
+            Application.World.setChunk(chunkPos[0] - 1, chunkPos[1] - 1, WorldGenerator.generateChunk(Application.World, chunkPos[0] - 1, chunkPos[1] - 1, Application.World.getAdjacentChunks(chunkPos[0] - 1, chunkPos[1] - 1)))
+            Application.World.setChunk(chunkPos[0] + 1, chunkPos[1] - 1, WorldGenerator.generateChunk(Application.World, chunkPos[0] + 1, chunkPos[1] - 1, Application.World.getAdjacentChunks(chunkPos[0] + 1, chunkPos[1] - 1)))
+            Application.World.setChunk(chunkPos[0], chunkPos[1] - 1, WorldGenerator.generateChunk(Application.World, chunkPos[0], chunkPos[1] - 1, Application.World.getAdjacentChunks(chunkPos[0], chunkPos[1] - 1)))
+
+            Application.World.setChunk(chunkPos[0] - 1, chunkPos[1] + 1, WorldGenerator.generateChunk(Application.World, chunkPos[0] - 1, chunkPos[1] + 1, Application.World.getAdjacentChunks(chunkPos[0] - 1, chunkPos[1] + 1)))
+            Application.World.setChunk(chunkPos[0] + 1, chunkPos[1] + 1, WorldGenerator.generateChunk(Application.World, chunkPos[0] + 1, chunkPos[1] + 1, Application.World.getAdjacentChunks(chunkPos[0] + 1, chunkPos[1] + 1)))
+            Application.World.setChunk(chunkPos[0], chunkPos[1] + 1, WorldGenerator.generateChunk(Application.World, chunkPos[0], chunkPos[1] + 1, Application.World.getAdjacentChunks(chunkPos[0], chunkPos[1] + 1)))
+          }, 10)
           break;
         }
       }

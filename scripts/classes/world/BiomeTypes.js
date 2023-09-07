@@ -1,92 +1,100 @@
 class BiomeTypes {
   static DEFAULT_BIOMES = [
     {
-      name: "deep_ocean",
-      weight: 300,
+      name: "ocean",
+      weight: 100,
+      minBlockNatural: 0,
+      maxBlockNatural: 20,
       blocks: [
         {
           blockType: BlockTypes.DEEP_OCEAN,
-          weight: 2000
+          weight: 10
         },
         {
           blockType: BlockTypes.OCEAN,
+          weight: 10
+        },
+        {
+          blockType: BlockTypes.SAND,
+          weight: 120
+        },
+        {
+          blockType: BlockTypes.GRASS,
+          weight: 110
+        },
+        {
+          blockType: BlockTypes.MOUNTAIN,
+          weight: 100
+        },
+        {
+          blockType: BlockTypes.HIGH_MOUNTAIN,
           weight: 100
         }
       ]
     },
     {
-      name: "ocean",
-      weight: 300,
+      name: "plain",
+      weight: 10,
+      minBlockNatural: 21,
+      maxBlockNatural: 140,
       blocks: [
         {
           blockType: BlockTypes.OCEAN,
-          weight: 2100
+          weight: 20
         },
         {
           blockType: BlockTypes.SAND,
-          weight: 100
-        }
-      ]
-    },
-    {
-      name: "Beach",
-      weight: 100,
-      blocks: [
-        {
-          blockType: BlockTypes.SAND,
-          weight: 0,
-          name: "grass"
+          weight: 40
         },
-        {
-          blockType: BlockTypes.OCEAN,
-          weight: 2100,
-          name: "ocean"
-        },
-
-        {
-          blockType: BlockTypes.SAND,
-          weight: 2000,
-          name: "sand"
-        },
-      ]
-    },
-    {
-      name: "Default",
-      weight: 140,
-      blocks: [
         {
           blockType: BlockTypes.GRASS,
-          weight: 0,
-          name: "grass"
+          weight: 70
         },
-        {
-          blockType: BlockTypes.OCEAN,
-          weight: 2600,
-          name: "ocean"
-        },
-
-        {
-          blockType: BlockTypes.GRASS,
-          weight: 8000,
-          name: "grass"
-        },
-
         {
           blockType: BlockTypes.FOREST,
-          weight: 4000,
-          name: "forest"
+          weight: 70
         },
-        {
-          blockType: BlockTypes.STONE,
-          weight: 8000,
-          name: "stone"
-        },
-        {
-          blockType: BlockTypes.SNOW_MOUNTAIN,
-          weight: 7000,
-          name: "snow_hills"
-        }
+        //{
+        //  blockType: BlockTypes.MOUNTAIN,
+        //  weight: 70
+        //},
+        //{
+        //  blockType: BlockTypes.SNOW_MOUNTAIN,
+        //  weight: 20
+        //},
       ]
-    }
+    },
+    //{
+    //  name: "mountains",
+    //  weight: 10,
+    //  minBlockNatural: 120,
+    //  maxBlockNatural: 430,
+    //  blocks: [
+    //    {
+    //      blockType: BlockTypes.OCEAN,
+    //      weight: 20
+    //    },
+    //    {
+    //      blockType: BlockTypes.SAND,
+    //      weight: 40
+    //    },
+    //    {
+    //      blockType: BlockTypes.GRASS,
+    //      weight: 70
+    //    },
+    //    {
+    //      blockType: BlockTypes.MOUNTAIN,
+    //      weight: 100
+    //    },
+    //    {
+    //      blockType: BlockTypes.HIGH_MOUNTAIN,
+    //      weight: 60
+    //    },
+    //    {
+    //      blockType: BlockTypes.SNOW_MOUNTAIN,
+    //      weight: 40
+    //    },
+    //  ]
+    //}
   ]
 }

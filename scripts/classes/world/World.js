@@ -23,7 +23,7 @@ class World {
     biome.blocks.forEach((blockCandidate) => {
       blockCandidateValue += blockCandidate.weight;
 
-      if (!biomeBlockType && weight < blockCandidateValue) {
+      if (!biomeBlockType && weight <= blockCandidateValue) {
         biomeBlockType = blockCandidate;
       }
     })
@@ -47,7 +47,7 @@ class World {
     BiomeTypes.DEFAULT_BIOMES.forEach((biomeCandidate) => {
       biomeCandidateValue += biomeCandidate.weight;
 
-      if (!currentBiome && biomeValue < biomeCandidateValue) {
+      if (!currentBiome && biomeValue <= biomeCandidateValue) {
         currentBiome = biomeCandidate
       }
     })

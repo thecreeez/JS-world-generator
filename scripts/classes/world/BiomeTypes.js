@@ -20,17 +20,17 @@ class BiomeTypes {
       blocks: [
         {
           blockType: BlockTypes.OCEAN,
-          weight: 100
+          weight: 2100
         },
         {
           blockType: BlockTypes.SAND,
-          weight: 5
+          weight: 500
         }
       ]
     },
     {
       name: "Beach",
-      weight: 5,
+      weight: 140,
       blocks: [
         {
           blockType: BlockTypes.SAND,
@@ -39,7 +39,7 @@ class BiomeTypes {
         },
         {
           blockType: BlockTypes.OCEAN,
-          weight: 100,
+          weight: 2100,
           name: "ocean"
         },
 
@@ -60,30 +60,30 @@ class BiomeTypes {
           name: "grass"
         },
         {
-          blockType: BlockTypes.SAND,
-          weight: 200,
-          name: "sand"
+          blockType: BlockTypes.OCEAN,
+          weight: 2600,
+          name: "ocean"
         },
 
         {
           blockType: BlockTypes.GRASS,
-          weight: 1000,
+          weight: 5000,
           name: "grass"
         },
 
         {
           blockType: BlockTypes.FOREST,
-          weight: 500,
+          weight: 10000,
           name: "forest"
         },
         {
           blockType: BlockTypes.STONE,
-          weight: 500,
+          weight: 15000,
           name: "stone"
         },
         {
           blockType: BlockTypes.SNOW_MOUNTAIN,
-          weight: 1000,
+          weight: 10000,
           name: "snow_hills"
         }
       ]

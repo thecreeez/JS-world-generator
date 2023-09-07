@@ -54,4 +54,14 @@ class MathHelper {
   static getVectorLength(pos) {
     return Math.sqrt(Math.pow(pos[0], 2) + Math.pow(pos[1], 2));
   }
+
+  static clamp(min, max, value) {
+    if (value > max)
+      return max;
+
+    if (value < min)
+      return min;
+
+    return value;
+  }
 }

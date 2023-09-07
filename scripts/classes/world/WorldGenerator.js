@@ -8,6 +8,14 @@ class WorldGenerator {
   static HEIGHT_NOISE_TIMES = 4;
   static HEIGHT_NOISE_STEP = 0.7  
 
+  /**
+   * 
+   * @param {World} world 
+   * @param {ChunkPos} x 
+   * @param {ChunkPos} y 
+   * @param {Object} param3 
+   * @returns {Chunk}
+   */
   static generateChunk(world, x, y, {leftChunk, rightChunk, topChunk, bottomChunk}) {
     let random = MathHelper.createRandom(world.getSeed() * x * y);
     let chunkTemperature = MathHelper.randomInBounds(world.getBiomeBounds()[0], world.getBiomeBounds()[1], random);
@@ -44,15 +52,15 @@ class WorldGenerator {
       bounds: world.getHeightBounds(chunkBiome)
     })
 
-    let heightStep = 0.4
+    let heightStep = 0.2;
 
     if (rightChunk) {
       heightNoise = PerlinNoiseGenerator.smoothNoise({
         noise: heightNoise,
         rightNoise: rightChunk.height,
 
-        mainNoiseBounds: world.getBiomeBounds(chunkBiome),
-        secondNoiseBounds: world.getBiomeBounds(rightChunk.getBiome()),
+        mainNoiseBounds: world.getHeightBounds(chunkBiome),
+        secondNoiseBounds: world.getHeightBounds(rightChunk.getBiome()),
         step: heightStep
       })
     }
@@ -62,8 +70,8 @@ class WorldGenerator {
         noise: heightNoise,
         leftNoise: leftChunk.height,
 
-        mainNoiseBounds: world.getBiomeBounds(chunkBiome),
-        secondNoiseBounds: world.getBiomeBounds(leftChunk.getBiome()),
+        mainNoiseBounds: world.getHeightBounds(chunkBiome),
+        secondNoiseBounds: world.getHeightBounds(leftChunk.getBiome()),
         step: heightStep
       })
     }
@@ -73,8 +81,8 @@ class WorldGenerator {
         noise: heightNoise,
         topNoise: topChunk.height,
 
-        mainNoiseBounds: world.getBiomeBounds(chunkBiome),
-        secondNoiseBounds: world.getBiomeBounds(topChunk.getBiome()),
+        mainNoiseBounds: world.getHeightBounds(chunkBiome),
+        secondNoiseBounds: world.getHeightBounds(topChunk.getBiome()),
         step: heightStep
       })
     }
@@ -84,8 +92,8 @@ class WorldGenerator {
         noise: heightNoise,
         bottomNoise: bottomChunk.height,
 
-        mainNoiseBounds: world.getBiomeBounds(chunkBiome),
-        secondNoiseBounds: world.getBiomeBounds(bottomChunk.getBiome()),
+        mainNoiseBounds: world.getHeightBounds(chunkBiome),
+        secondNoiseBounds: world.getHeightBounds(bottomChunk.getBiome()),
         step: heightStep
       })
     }

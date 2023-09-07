@@ -26,14 +26,11 @@ class PerlinNoiseGenerator {
       for (let y = 0; y < leftNoise.length; y++) {
         let leftNoiseValue = leftNoise[y][leftNoise[y].length - 1];
 
-        if (leftNoiseValue > noise[y][0])
-          console.log("before", noise[y][0], leftNoiseValue, mainNoiseBounds[1])
-
         noise[y][0] = 
-          MathHelper.clamp(mainNoiseBounds[0], mainNoiseBounds[1], MathHelper.interpolate(noise[y][0] / mainNoiseBounds[1], leftNoiseValue / secondNoiseBounds[1], step) * mainNoiseBounds[1]);
+          MathHelper.clamp(mainNoiseBounds[0], mainNoiseBounds[1], MathHelper.interpolate(noise[y][0], leftNoiseValue, step));
         for (let i = 1; i < Math.min(blockSmooth, noise[y].length); i++) {
           noise[y][i] = 
-            MathHelper.clamp(mainNoiseBounds[0], mainNoiseBounds[1], MathHelper.interpolate(noise[y][i] / mainNoiseBounds[1], noise[y][i - 1] / secondNoiseBounds[1], step) * mainNoiseBounds[1]);
+            MathHelper.clamp(mainNoiseBounds[0], mainNoiseBounds[1], MathHelper.interpolate(noise[y][i], noise[y][i - 1], step * i));
         }
       }
     }
@@ -43,10 +40,10 @@ class PerlinNoiseGenerator {
         let rightNoiseValue = rightNoise[y][0];
 
         noise[y][noise[y].length - 1] = 
-          MathHelper.clamp(mainNoiseBounds[0], mainNoiseBounds[1], MathHelper.interpolate(noise[y][noise[y].length - 1] / mainNoiseBounds[1], rightNoiseValue / secondNoiseBounds[1], step) * mainNoiseBounds[1]);
+          MathHelper.clamp(mainNoiseBounds[0], mainNoiseBounds[1], MathHelper.interpolate(noise[y][noise[y].length - 1], rightNoiseValue, step));
         for (let i = 1; i < Math.min(blockSmooth, noise[y].length); i++) {
           noise[y][noise[y].length - 1 - i] = 
-            MathHelper.clamp(mainNoiseBounds[0], mainNoiseBounds[1], MathHelper.interpolate(noise[y][noise[y].length - 1 - i] / mainNoiseBounds[1], noise[y][noise[y].length - i] / secondNoiseBounds[1], step) * mainNoiseBounds[1]);
+            MathHelper.clamp(mainNoiseBounds[0], mainNoiseBounds[1], MathHelper.interpolate(noise[y][noise[y].length - 1 - i], noise[y][noise[y].length - i], step * i));
         }
       }
     }
@@ -56,10 +53,10 @@ class PerlinNoiseGenerator {
         let topNoiseValue = topNoise[topNoise.length - 1][x];
 
         noise[0][x] = 
-          MathHelper.clamp(mainNoiseBounds[0], mainNoiseBounds[1], MathHelper.interpolate(noise[0][x] / mainNoiseBounds[1], topNoiseValue / secondNoiseBounds[1], step) * mainNoiseBounds[1]);
+          MathHelper.clamp(mainNoiseBounds[0], mainNoiseBounds[1], MathHelper.interpolate(noise[0][x], topNoiseValue, step));
         for (let i = 1; i < Math.min(blockSmooth, noise.length); i++) {
           noise[i][x] = 
-            MathHelper.clamp(mainNoiseBounds[0], mainNoiseBounds[1], MathHelper.interpolate(noise[i][x] / mainNoiseBounds[1], noise[i - 1][x] / secondNoiseBounds[1], step) * mainNoiseBounds[1]);
+            MathHelper.clamp(mainNoiseBounds[0], mainNoiseBounds[1], MathHelper.interpolate(noise[i][x], noise[i - 1][x], step * i));
         }
       }
     }
@@ -69,11 +66,11 @@ class PerlinNoiseGenerator {
         let bottomNoiseValue = bottomNoise[0][x];
 
         noise[noise.length - 1][x] = 
-          MathHelper.clamp(mainNoiseBounds[0], mainNoiseBounds[1], MathHelper.interpolate(noise[noise.length - 1][x] / mainNoiseBounds[1], bottomNoiseValue / secondNoiseBounds[1], step) * mainNoiseBounds[1]);
+          MathHelper.clamp(mainNoiseBounds[0], mainNoiseBounds[1], MathHelper.interpolate(noise[noise.length - 1][x], bottomNoiseValue, step));
 
         for (let i = 1; i < Math.min(blockSmooth,noise.length); i++) {
           noise[noise.length - 1 - i][x] = 
-            MathHelper.clamp(mainNoiseBounds[0], mainNoiseBounds[1], MathHelper.interpolate(noise[noise.length - 1 - i][x] / mainNoiseBounds[1], noise[noise.length - i][x] / secondNoiseBounds[1], step) * mainNoiseBounds[1]);
+            MathHelper.clamp(mainNoiseBounds[0], mainNoiseBounds[1], MathHelper.interpolate(noise[noise.length - 1 - i][x], noise[noise.length - i][x], step * i));
         }
       }
     }

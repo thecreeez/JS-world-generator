@@ -2,7 +2,7 @@ class BiomeTypes {
   static DEFAULT_BIOMES = [
     {
       name: "deep_ocean",
-      weight: 110,
+      weight: 300,
       blocks: [
         {
           blockType: BlockTypes.DEEP_OCEAN,
@@ -16,7 +16,7 @@ class BiomeTypes {
     },
     {
       name: "ocean",
-      weight: 50,
+      weight: 300,
       blocks: [
         {
           blockType: BlockTypes.OCEAN,
@@ -24,13 +24,13 @@ class BiomeTypes {
         },
         {
           blockType: BlockTypes.SAND,
-          weight: 500
+          weight: 100
         }
       ]
     },
     {
       name: "Beach",
-      weight: 140,
+      weight: 100,
       blocks: [
         {
           blockType: BlockTypes.SAND,
@@ -45,7 +45,7 @@ class BiomeTypes {
 
         {
           blockType: BlockTypes.SAND,
-          weight: 100,
+          weight: 2000,
           name: "sand"
         },
       ]
@@ -67,23 +67,23 @@ class BiomeTypes {
 
         {
           blockType: BlockTypes.GRASS,
-          weight: 5000,
+          weight: 8000,
           name: "grass"
         },
 
         {
           blockType: BlockTypes.FOREST,
-          weight: 10000,
+          weight: 4000,
           name: "forest"
         },
         {
           blockType: BlockTypes.STONE,
-          weight: 15000,
+          weight: 8000,
           name: "stone"
         },
         {
           blockType: BlockTypes.SNOW_MOUNTAIN,
-          weight: 10000,
+          weight: 7000,
           name: "snow_hills"
         }
       ]

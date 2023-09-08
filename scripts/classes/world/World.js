@@ -12,51 +12,6 @@ class World {
 
   /**
    * 
-   * @param {Biome} biome 
-   * @param {Number} height 
-   * @returns {Block} Block with needed height for specified biome
-   */
-  getBlockType(biome, weight) {
-    let biomeBlockType = null;
-
-    let blockCandidateValue = 0;
-    biome.blocks.forEach((blockCandidate) => {
-      blockCandidateValue += blockCandidate.weight;
-
-      if (!biomeBlockType && weight <= blockCandidateValue) {
-        biomeBlockType = blockCandidate;
-      }
-    })
-
-    if (!biomeBlockType) {
-      return BlockTypes.DEFAULT;
-    }
-
-    return biomeBlockType.blockType;
-  }
-
-  /**
-   * Returns Biome from BiomeTypes
-   * @param {Number} biomeValue 
-   * @returns {Biome} Biome
-   */
-  getBiome(biomeValue) {
-    let currentBiome = null;
-    
-    let biomeCandidateValue = 0;
-    BiomeTypes.DEFAULT_BIOMES.forEach((biomeCandidate) => {
-      biomeCandidateValue += biomeCandidate.weight;
-
-      if (!currentBiome && biomeValue <= biomeCandidateValue) {
-        currentBiome = biomeCandidate
-      }
-    })
-
-    return currentBiome;
-  }
-
-  /**
-   * 
    * @param {ChunkPosition} x 
    * @param {ChunkPosition} y 
    * @returns 
@@ -115,50 +70,6 @@ class World {
     return chunk.getBlock(blockLocalPos[0], blockLocalPos[1]);
   }
 
-  getBiomeBounds() {
-    return [0, this.getBoundsHeightBiome().max];
-  }
-
-  getHeightBounds(biome) {
-    return [0, this.getBoundsHeightBlock(biome).max]
-  }
-
-  /**
-   * @returns {Object} { min, max } values of biome heights
-   */
-  getBoundsHeightBiome() {
-    let min = 0;
-    let max = 0;
-
-    BiomeTypes.DEFAULT_BIOMES.forEach((biome) => {
-      max += biome.weight;
-    })
-
-    return {
-      max,
-      min
-    };
-  }
-
-  /**
-   * 
-   * @param {Biome} biome 
-   * @returns {Object} { min, max } values of biome blocks heights
-   */
-  getBoundsHeightBlock(biome) {
-    let min = 0;
-    let max = 0;
-
-    biome.blocks.forEach((block) => {
-      max += block.weight;
-    })
-
-    return {
-      max,
-      min
-    };
-  }
-
   /**
    * Render world
    * @param {Number} deltaTime 
@@ -194,10 +105,10 @@ class World {
             renderChunk.currentAnimationTime -= deltaTime;
           }
 
-          //if (chunkFogAlpha > 0) {
-          //  ctx.fillStyle = `rgba(${this.getBackgroundColor()[0]},${this.getBackgroundColor()[1]},${this.getBackgroundColor()[2]},${chunkFogAlpha})`;
-          //  ctx.fillRect(x * chunkSize - 1, y * chunkSize - 1, chunkSize + 2, chunkSize + 2);
-          //}
+          if (!Application.DEBUG_MODE && chunkFogAlpha > 0) {
+            ctx.fillStyle = `rgba(${this.getBackgroundColor()[0]},${this.getBackgroundColor()[1]},${this.getBackgroundColor()[2]},${chunkFogAlpha})`;
+            ctx.fillRect(x * chunkSize - 1, y * chunkSize - 1, chunkSize + 2, chunkSize + 2);
+          }
         }
       }
     }

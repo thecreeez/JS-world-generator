@@ -40,7 +40,7 @@ class Application {
     Application.MAX_FPS = fpsMax;
     Application.MAX_TICKS = ticksPerSecond;
 
-    this.EventBus.invoke(EventBus.TYPES.APPLICATION_START, {
+    this.EventBus.invoke(EventType.APPLICATION_START, {
       debug,
       ticksPerSecond,
       fpsMax
@@ -99,40 +99,35 @@ class Application {
           let chunkPos = Application.World.camera.getChunkPos();
           Application.World.setChunk(chunkPos[0], chunkPos[1], WorldGenerator.generateChunk(Application.World, chunkPos[0], chunkPos[1], Application.World.getAdjacentChunks(chunkPos[0], chunkPos[1])))
 
-          setTimeout(() => {
-            Application.World.setChunk(chunkPos[0] - 1, chunkPos[1], WorldGenerator.generateChunk(Application.World, chunkPos[0] - 1, chunkPos[1], Application.World.getAdjacentChunks(chunkPos[0] - 1, chunkPos[1])))
-            Application.World.setChunk(chunkPos[0] + 1, chunkPos[1], WorldGenerator.generateChunk(Application.World, chunkPos[0] + 1, chunkPos[1], Application.World.getAdjacentChunks(chunkPos[0] + 1, chunkPos[1])))
-
-            Application.World.setChunk(chunkPos[0] - 1, chunkPos[1] - 1, WorldGenerator.generateChunk(Application.World, chunkPos[0] - 1, chunkPos[1] - 1, Application.World.getAdjacentChunks(chunkPos[0] - 1, chunkPos[1] - 1)))
-            Application.World.setChunk(chunkPos[0] + 1, chunkPos[1] - 1, WorldGenerator.generateChunk(Application.World, chunkPos[0] + 1, chunkPos[1] - 1, Application.World.getAdjacentChunks(chunkPos[0] + 1, chunkPos[1] - 1)))
-            Application.World.setChunk(chunkPos[0], chunkPos[1] - 1, WorldGenerator.generateChunk(Application.World, chunkPos[0], chunkPos[1] - 1, Application.World.getAdjacentChunks(chunkPos[0], chunkPos[1] - 1)))
-
-            Application.World.setChunk(chunkPos[0] - 1, chunkPos[1] + 1, WorldGenerator.generateChunk(Application.World, chunkPos[0] - 1, chunkPos[1] + 1, Application.World.getAdjacentChunks(chunkPos[0] - 1, chunkPos[1] + 1)))
-            Application.World.setChunk(chunkPos[0] + 1, chunkPos[1] + 1, WorldGenerator.generateChunk(Application.World, chunkPos[0] + 1, chunkPos[1] + 1, Application.World.getAdjacentChunks(chunkPos[0] + 1, chunkPos[1] + 1)))
-            Application.World.setChunk(chunkPos[0], chunkPos[1] + 1, WorldGenerator.generateChunk(Application.World, chunkPos[0], chunkPos[1] + 1, Application.World.getAdjacentChunks(chunkPos[0], chunkPos[1] + 1)))
-          }, 10)
-          break;
+          Application.World.setChunk(chunkPos[0] - 1, chunkPos[1], WorldGenerator.generateChunk(Application.World, chunkPos[0] - 1, chunkPos[1], Application.World.getAdjacentChunks(chunkPos[0] - 1, chunkPos[1])))
+          Application.World.setChunk(chunkPos[0] + 1, chunkPos[1], WorldGenerator.generateChunk(Application.World, chunkPos[0] + 1, chunkPos[1], Application.World.getAdjacentChunks(chunkPos[0] + 1, chunkPos[1])))
+          Application.World.setChunk(chunkPos[0] - 1, chunkPos[1] - 1, WorldGenerator.generateChunk(Application.World, chunkPos[0] - 1, chunkPos[1] - 1, Application.World.getAdjacentChunks(chunkPos[0] - 1, chunkPos[1] - 1)))
+          Application.World.setChunk(chunkPos[0] + 1, chunkPos[1] - 1, WorldGenerator.generateChunk(Application.World, chunkPos[0] + 1, chunkPos[1] - 1, Application.World.getAdjacentChunks(chunkPos[0] + 1, chunkPos[1] - 1)))
+          Application.World.setChunk(chunkPos[0], chunkPos[1] - 1, WorldGenerator.generateChunk(Application.World, chunkPos[0], chunkPos[1] - 1, Application.World.getAdjacentChunks(chunkPos[0], chunkPos[1] - 1)))
+          Application.World.setChunk(chunkPos[0] - 1, chunkPos[1] + 1, WorldGenerator.generateChunk(Application.World, chunkPos[0] - 1, chunkPos[1] + 1, Application.World.getAdjacentChunks(chunkPos[0] - 1, chunkPos[1] + 1)))
+          Application.World.setChunk(chunkPos[0] + 1, chunkPos[1] + 1, WorldGenerator.generateChunk(Application.World, chunkPos[0] + 1, chunkPos[1] + 1, Application.World.getAdjacentChunks(chunkPos[0] + 1, chunkPos[1] + 1)))
+          Application.World.setChunk(chunkPos[0], chunkPos[1] + 1, WorldGenerator.generateChunk(Application.World, chunkPos[0], chunkPos[1] + 1, Application.World.getAdjacentChunks(chunkPos[0], chunkPos[1] + 1)))
         }
       }
     }
   }
 
   static render(deltaTime) {
-    this.EventBus.invoke(EventBus.TYPES.RENDER_FRAME_START, {});
+    this.EventBus.invoke(EventType.RENDER_FRAME_START, {});
     
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     if (Application.World) {
-      this.EventBus.invoke(EventBus.TYPES.RENDER_WORLD_START, {});
+      this.EventBus.invoke(EventType.RENDER_WORLD_START, {});
       let backColor = Application.World.getBackgroundColor();
       ctx.fillStyle = `rgb(${backColor[0]},${backColor[1]},${backColor[2]})`
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
       Application.World.render(deltaTime);
-      this.EventBus.invoke(EventBus.TYPES.RENDER_WORLD_END, {});
+      this.EventBus.invoke(EventType.RENDER_WORLD_END, {});
     }
 
-    this.EventBus.invoke(EventBus.TYPES.RENDER_UI_START, {});
+    this.EventBus.invoke(EventType.RENDER_UI_START, {});
     if (Application._currentLogoTime > 0) {
       this.renderLogo();
       Application._currentLogoTime -= deltaTime;
@@ -140,9 +135,9 @@ class Application {
 
     Application.UIManager.update();
     Application.UIManager.render();
-    this.EventBus.invoke(EventBus.TYPES.RENDER_UI_END, {});
+    this.EventBus.invoke(EventType.RENDER_UI_END, {});
 
-    this.EventBus.invoke(EventBus.TYPES.RENDER_FRAME_END, {});
+    this.EventBus.invoke(EventType.RENDER_FRAME_END, {});
   }
 
   static update(deltaTime) {

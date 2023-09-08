@@ -1,8 +1,8 @@
-Application.EventBus.subscribe(EventBus.TYPES.UPDATE_START, () => {
+Application.EventBus.subscribe(EventType.UPDATE_START, () => {
 
 })
 
-Application.EventBus.subscribe(EventBus.TYPES.UPDATE_END, ({ deltaTime, generatedChunks, timeToGenerateChunks, maxTimeToGenerateChunks }) => {
+Application.EventBus.subscribe(EventType.UPDATE_END, ({ deltaTime, generatedChunks, timeToGenerateChunks, maxTimeToGenerateChunks }) => {
   if (Application.DEBUG_MODE) {
     const DEBUG_CONTAINER = Application.UIManager.getElement(DebugHelper.DEBUG_HELPER_MENU_ID);
     let UPS_PROFILER_CONTAINER = DEBUG_CONTAINER.getElement("UPSProfilerContainer");

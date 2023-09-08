@@ -1,8 +1,8 @@
-Application.EventBus.subscribe(EventBus.TYPES.RENDER_FRAME_START, () => {
+Application.EventBus.subscribe(EventType.RENDER_FRAME_START, () => {
   
 })
 
-Application.EventBus.subscribe(EventBus.TYPES.RENDER_FRAME_END, () => {
+Application.EventBus.subscribe(EventType.RENDER_FRAME_END, () => {
   DebugHelper.render();
 
   // Профайлер для отрисовки кадра

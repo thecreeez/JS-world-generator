@@ -27,6 +27,10 @@ class Block {
     return `rgba(${this._red},${this._green},${this._blue},${this._alpha})`;
   }
 
+  getRGBColor() {
+    return [this._red, this._green, this._blue]
+  }
+
   getHeight() {
     return this._height;
   }

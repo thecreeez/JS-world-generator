@@ -1,7 +1,8 @@
 class Camera {
   static RENDER_TYPES = {
     DEFAULT: "default",
-    HEIGHTS: "height"
+    HEIGHTS: "height",
+    BIOMES: "biomes"
   }
 
   static RENDER_TYPE = this.RENDER_TYPES.DEFAULT;

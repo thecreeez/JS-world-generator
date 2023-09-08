@@ -124,11 +124,11 @@ class World {
    * @param {Number} deltaTime 
    */
   update(deltaTime) {
-    Application.EventBus.invoke(EventBus.TYPES.UPDATE_START, { deltaTime })
+    Application.EventBus.invoke(EventType.UPDATE_START, { deltaTime })
     let chunkGenerationData = this._updateChunksGeneration(deltaTime);
 
     // Переделать эту тему / Переназвать ивент
-    Application.EventBus.invoke(EventBus.TYPES.UPDATE_END, chunkGenerationData)
+    Application.EventBus.invoke(EventType.UPDATE_END, chunkGenerationData)
   }
 
   /**
@@ -149,8 +149,16 @@ class World {
 
       while (chunksToGenerate.length > 0 && currentTime - startTime < maxTimeToGenerateChunks) {
         let chunkData = chunksToGenerate[0];
+        let adjacentChunks = this.getAdjacentChunks(chunkData.x, chunkData.y);
+        let generatedChunk = WorldGenerator.generateChunk(this, chunkData.x, chunkData.y, adjacentChunks);
 
-        this.setChunk(chunkData.x, chunkData.y, WorldGenerator.generateChunk(this, chunkData.x, chunkData.y, this.getAdjacentChunks(chunkData.x, chunkData.y)))
+        this.setChunk(chunkData.x, chunkData.y, generatedChunk)
+        Application.EventBus.invoke(EventType.ON_CHUNK_GENERATE, generatedChunk);
+
+        for (const side in adjacentChunks) {
+          if (adjacentChunks[side])
+            Application.EventBus.invoke(EventType.ON_NEARBY_CHUNK_GENERATES, { chunk: adjacentChunks[side], side, generated: generatedChunk });
+        }
 
         chunksToGenerate.splice(0, 1);
         generatedChunks++;

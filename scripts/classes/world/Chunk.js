@@ -57,7 +57,7 @@ class Chunk {
   }
 
   // Рендер чанка в контексте и особой позиции
-  bake({ renderType = Camera.RENDER_TYPES.DEFAULT, alpha = 0} = {}) {
+  _bake({ renderType = Camera.RENDER_TYPES.DEFAULT, alpha = 0} = {}) {
     let ctx = this._canvas.getContext("2d");
 
     for (let y = 0; y < World.ChunkSize[1]; y++) {
@@ -70,7 +70,8 @@ class Chunk {
 
         switch (renderType) {
           case Camera.RENDER_TYPES.DEFAULT: ctx.fillStyle = block.getColor(); break;
-          case Camera.RENDER_TYPES.HEIGHTS: let color = this.height[y][x] / this.getBiome().maxBlockNatural * 255; ctx.fillStyle = `rgb(${color}, ${color}, ${color})`; break;
+          case Camera.RENDER_TYPES.HEIGHTS: {let color = this.height[y][x] / this.getBiome().getNaturalBounds()[1] * 255; ctx.fillStyle = `rgb(${color}, ${color}, ${color})`; break};
+          case Camera.RENDER_TYPES.BIOMES: {let color = this.getBiome().getColor(); ctx.fillStyle = color; break};
         }
          
         ctx.fillRect(x * Application.TEXTURE_SIZE, y * Application.TEXTURE_SIZE, Application.TEXTURE_SIZE, Application.TEXTURE_SIZE);
@@ -88,6 +89,14 @@ class Chunk {
 
     this._renderType = renderType;
     this._needToBake = false;
+
+    Application.EventBus.invoke(EventType.ON_CHUNK_BAKE, this);
+    let adjacentChunks = Application.World.getAdjacentChunks(this._x, this._y);
+
+    for (const side in adjacentChunks) {
+      if (adjacentChunks[side])
+        Application.EventBus.invoke(EventType.ON_NEARBY_CHUNK_BAKE, { chunk: adjacentChunks[side], side, baked: this });
+    }
   }
 
   setNeedToBake(value) {
@@ -96,11 +105,11 @@ class Chunk {
 
   getCanvas(renderType = Camera.RENDER_TYPES.DEFAULT) {
     if (this._needToBake) {
-      this.bake({ renderType });
+      this._bake({ renderType });
     }
 
     if (Camera.RENDER_TYPE != this._renderType) {
-      this.bake({ renderType });
+      this._bake({ renderType });
     }
 
     if (this.currentAnimationTime > 0) {

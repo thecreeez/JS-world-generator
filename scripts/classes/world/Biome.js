@@ -11,7 +11,7 @@ class Biome {
     };
   }
 
-  constructor({ id, heightWeight, temperatureWeight, blockHeightNaturalBounds, blocks = [] }) {
+  constructor({ id, heightWeight, temperatureWeight, blockHeightNaturalBounds, blocks = [], color = [0,0,0], biomeBlockType = null }) {
     this._id = id;
     this._weights = {
       height: heightWeight,
@@ -20,6 +20,10 @@ class Biome {
 
     this._blockBounds = blockHeightNaturalBounds;
     this._blocks = blocks;
+    this._color = color;
+
+    if (biomeBlockType)
+      this._color = biomeBlockType.getRGBColor();
   }
 
   /**
@@ -67,6 +71,10 @@ class Biome {
 
   getNaturalBounds() {
     return this._blockBounds;
+  }
+
+  getColor() {
+    return `rgb(${this._color[0]},${this._color[1]},${this._color[2]})`;
   }
 
   _getMaxBlockHeight() {

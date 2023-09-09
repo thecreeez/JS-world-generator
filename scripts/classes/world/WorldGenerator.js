@@ -3,26 +3,29 @@
  */
 
 class WorldGenerator {
-  static BIOME_SMOOTH = 0.5;
+  static BIOME_SMOOTH = 0.8;
 
   static HEIGHT_NOISE_TIMES = 7;
   static HEIGHT_NOISE_STEP = 0.6
 
-  static CHUNKS_HEIGHTS_SMOOTH_STEP = 0.6;
+  static CHUNKS_HEIGHTS_SMOOTH_STEP = 0.8;
 
   /**
    * Returns Biome from BiomeTypes
    * @param {Number} biomeHeight 
+   * @param {Number} biomeTemperature
    * @returns {Biome} Biome
    */
-  static getBiome(biomeHeight) {
+  static getBiome(biomeHeight, biomeTemperature) {
     let currentBiome = null;
 
     let biomeCandidateHeight = 0;
+    let biomeCandidateTemperature = 0;
     BiomeTypes.DEFAULT_BIOMES.forEach((biomeCandidate) => {
       biomeCandidateHeight += biomeCandidate.getHeight();
+      biomeCandidateTemperature += biomeCandidate.getTemperature();
 
-      if (!currentBiome && biomeHeight <= biomeCandidateHeight) {
+      if (!currentBiome && biomeHeight <= biomeCandidateHeight && biomeTemperature <= biomeCandidateTemperature) {
         currentBiome = biomeCandidate
       }
     })
@@ -30,14 +33,7 @@ class WorldGenerator {
     return currentBiome;
   }
 
-  static getBiomeBounds() {
-    return [0, WorldGenerator.getBoundsHeightBiome().max];
-  }
-
-  /**
-   * @returns {Object} { min, max } values of biome heights
-   */
-  static getBoundsHeightBiome() {
+  static getBiomeHeightBounds() {
     let min = 0;
     let max = 0;
 
@@ -45,10 +41,18 @@ class WorldGenerator {
       max += biome.getHeight();
     })
 
-    return {
-      max,
-      min
-    };
+    return [min, max]
+  }
+
+  static getBiomeTemperatureBounds() {
+    let min = 0;
+    let max = 0;
+
+    BiomeTypes.DEFAULT_BIOMES.forEach((biome) => {
+      max += biome.getTemperature();
+    })
+
+    return [min, max]
   }
 
   /**
@@ -60,28 +64,34 @@ class WorldGenerator {
    * @returns {Chunk}
    */
   static generateChunk(world, x, y, {leftChunk, rightChunk, topChunk, bottomChunk}) {
-    let random = MathHelper.createRandom(world.getSeed() * x * y);
-    let chunkHeight = MathHelper.randomInBounds(WorldGenerator.getBiomeBounds()[0], WorldGenerator.getBiomeBounds()[1], random);
+    let random = MathHelper.createRandom(world.getSeed() * x * y * 2);
+    let chunkHeight = MathHelper.randomInBounds(WorldGenerator.getBiomeHeightBounds()[0], WorldGenerator.getBiomeHeightBounds()[1], random);
+    random = MathHelper.createRandom(world.getSeed() * x * y * 10);
+    let chunkTemperature = MathHelper.randomInBounds(WorldGenerator.getBiomeTemperatureBounds()[0], WorldGenerator.getBiomeTemperatureBounds()[1], random);
 
     for (let i = 0; i < 1; i++) {
       if (topChunk) {
-        chunkHeight = MathHelper.interpolate(chunkHeight, topChunk.getTemperature(), WorldGenerator.BIOME_SMOOTH);
+        chunkTemperature = MathHelper.interpolate(chunkTemperature, topChunk.getTemperature(), WorldGenerator.BIOME_SMOOTH);
+        chunkHeight = MathHelper.interpolate(chunkHeight, topChunk.getHeight(), WorldGenerator.BIOME_SMOOTH);
       }
 
       if (rightChunk) {
-        chunkHeight = MathHelper.interpolate(chunkHeight, rightChunk.getTemperature(), WorldGenerator.BIOME_SMOOTH);
+        chunkTemperature = MathHelper.interpolate(chunkTemperature, rightChunk.getTemperature(), WorldGenerator.BIOME_SMOOTH);
+        chunkHeight = MathHelper.interpolate(chunkHeight, rightChunk.getHeight(), WorldGenerator.BIOME_SMOOTH);
       }
 
       if (bottomChunk) {
-        chunkHeight = MathHelper.interpolate(chunkHeight, bottomChunk.getTemperature(), WorldGenerator.BIOME_SMOOTH);
+        chunkTemperature = MathHelper.interpolate(chunkTemperature, bottomChunk.getTemperature(), WorldGenerator.BIOME_SMOOTH);
+        chunkHeight = MathHelper.interpolate(chunkHeight, bottomChunk.getHeight(), WorldGenerator.BIOME_SMOOTH);
       }
 
       if (leftChunk) {
-        chunkHeight = MathHelper.interpolate(chunkHeight, leftChunk.getTemperature(), WorldGenerator.BIOME_SMOOTH);
+        chunkTemperature = MathHelper.interpolate(chunkTemperature, leftChunk.getTemperature(), WorldGenerator.BIOME_SMOOTH);
+        chunkHeight = MathHelper.interpolate(chunkHeight, leftChunk.getHeight(), WorldGenerator.BIOME_SMOOTH);
       }
     }
 
-    let chunkBiome = WorldGenerator.getBiome(chunkHeight);
+    let chunkBiome = WorldGenerator.getBiome(chunkHeight, chunkTemperature);
 
     if (!chunkBiome) {
       console.log(chunkHeight)
@@ -99,7 +109,7 @@ class WorldGenerator {
     if (rightChunk) {
       heightNoise = PerlinNoiseGenerator.smoothNoise({
         noise: heightNoise,
-        rightNoise: rightChunk.height,
+        rightNoise: rightChunk.noise,
         blockSmooth: 5,
 
         mainNoiseBounds: chunkBiome.getHeightBounds(),
@@ -111,7 +121,7 @@ class WorldGenerator {
     if (leftChunk) {
       heightNoise = PerlinNoiseGenerator.smoothNoise({
         noise: heightNoise,
-        leftNoise: leftChunk.height,
+        leftNoise: leftChunk.noise,
         blockSmooth: 5,
 
         mainNoiseBounds: chunkBiome.getHeightBounds(),
@@ -123,7 +133,7 @@ class WorldGenerator {
     if (topChunk) {
       heightNoise = PerlinNoiseGenerator.smoothNoise({
         noise: heightNoise,
-        topNoise: topChunk.height,
+        topNoise: topChunk.noise,
         blockSmooth: 5,
 
         mainNoiseBounds: chunkBiome.getHeightBounds(),
@@ -135,7 +145,7 @@ class WorldGenerator {
     if (bottomChunk) {
       heightNoise = PerlinNoiseGenerator.smoothNoise({
         noise: heightNoise,
-        bottomNoise: bottomChunk.height,
+        bottomNoise: bottomChunk.noise,
         blockSmooth: 5,
 
         mainNoiseBounds: chunkBiome.getHeightBounds(),
@@ -144,7 +154,7 @@ class WorldGenerator {
       })
     }
 
-    let chunk = new Chunk(x, y, { biome: chunkBiome, temperature: chunkHeight, height: heightNoise })
+    let chunk = new Chunk(x, y, { biome: chunkBiome, temperature: chunkTemperature, height: chunkHeight, noise: heightNoise })
 
     for (let chunkY = 0; chunkY < World.ChunkSize[1]; chunkY++) {
       for (let chunkX = 0; chunkX < World.ChunkSize[0]; chunkX++) {

@@ -63,6 +63,10 @@ class Biome {
     return this._weights.height;
   }
 
+  getTemperature() {
+    return this._weights.temperature;
+  }
+
   getHeightBounds() {
     let min = 0;
 

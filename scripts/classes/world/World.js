@@ -88,7 +88,7 @@ class World {
       for (let x = chunksBoundsToRender.min[0]; x < chunksBoundsToRender.max[0]; x++) {
         let renderChunk = this.getChunk(x, y);
         if (renderChunk) {
-          ctx.drawImage(renderChunk.getCanvas(Camera.RENDER_TYPE), x * chunkSize, y * chunkSize, chunkSize, chunkSize);
+          ctx.drawImage(renderChunk.getCanvas(Camera.RENDER_TYPE), x * chunkSize - 0.5, y * chunkSize - 0.5, chunkSize + 1, chunkSize + 1);
 
           chunksToRender++;
           // Если чанк камеры

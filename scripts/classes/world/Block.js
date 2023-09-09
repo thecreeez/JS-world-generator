@@ -7,9 +7,9 @@ class Block {
     this._height = height;
 
     if (blockType) {
-      this._red = blockType._red //- blockType._red * (Math.random() / 6);
-      this._green = blockType._green //- blockType._green * (Math.random() / 6);
-      this._blue = blockType._blue //- blockType._blue * (Math.random() / 6);
+      this._red = blockType._red - blockType._red * (Math.random() / 20);
+      this._green = blockType._green - blockType._green * (Math.random() / 20);
+      this._blue = blockType._blue - blockType._blue * (Math.random() / 20);
     }
   }
 

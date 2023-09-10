@@ -1,5 +1,5 @@
 class Chunk {
-  constructor(x, y, { height, noise, biome, temperature }) {
+  constructor(x, y, { height, heightNoise, cloudNoise, biome, temperature }) {
     this._x = x;
     this._y = y;
 
@@ -10,7 +10,8 @@ class Chunk {
     this._canvas.width = World.ChunkSize[0] * Application.TEXTURE_SIZE;
     this._canvas.height = World.ChunkSize[1] * Application.TEXTURE_SIZE;
 
-    this.noise = noise;
+    this.heightNoise = heightNoise;
+    this.cloudNoise = cloudNoise;
 
     this.biome = biome;
 
@@ -76,6 +77,9 @@ class Chunk {
           case Camera.RENDER_TYPES.BIOMES: {let color = this.getBiome().getColor(); ctx.fillStyle = color; break};
         }
          
+        ctx.fillRect(x * Application.TEXTURE_SIZE, y * Application.TEXTURE_SIZE, Application.TEXTURE_SIZE, Application.TEXTURE_SIZE);
+
+        ctx.fillStyle = `rgba(255,255,255,${this.cloudNoise[y][x]})`;
         ctx.fillRect(x * Application.TEXTURE_SIZE, y * Application.TEXTURE_SIZE, Application.TEXTURE_SIZE, Application.TEXTURE_SIZE);
       }
     }

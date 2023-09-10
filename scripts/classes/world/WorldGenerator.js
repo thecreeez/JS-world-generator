@@ -23,6 +23,11 @@ class WorldGenerator {
     let biomeCandidateTemperature = 0;
     BiomeTypes.DEFAULT_BIOMES.forEach((biomeCandidate) => {
       biomeCandidateHeight += biomeCandidate.getHeight();
+
+      if (!currentBiome && biomeHeight <= biomeCandidateHeight && biomeTemperature <= biomeCandidateTemperature) {
+        currentBiome = biomeCandidate
+      }
+
       biomeCandidateTemperature += biomeCandidate.getTemperature();
 
       if (!currentBiome && biomeHeight <= biomeCandidateHeight && biomeTemperature <= biomeCandidateTemperature) {

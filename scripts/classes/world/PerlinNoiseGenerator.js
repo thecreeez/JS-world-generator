@@ -1,5 +1,4 @@
 class PerlinNoiseGenerator {
-  /* СДЕЛАТЬ MIN/MAX ЗНАЧЕНИЯ */
   static noise({ size = [2, 2], times, step, seed, bounds = [-1, 1] }) {
     let noiseArr = PerlinNoiseGenerator._noise({ xSize: size[0], ySize: size[1], seed, bounds });
 
@@ -8,6 +7,19 @@ class PerlinNoiseGenerator {
     }
 
     return noiseArr;
+  }
+
+  /**
+   * Apply func on all values of noise
+   * @param {Noise} noise 
+   * @param {Function} func 
+   */
+  static manipulateWithValues(noise, func) {
+    for (let y = 0; y < noise.length; y++) {
+      for (let x = 0; x < noise[y].length; x++) {
+        noise[y][x] = func(noise[y][x]);
+      }
+    }
   }
 
   // Сглаживает разницу между шумами (берет только самый крайний и сглаживает ровно blockSmooth значений)

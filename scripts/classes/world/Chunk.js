@@ -1,10 +1,11 @@
 class Chunk {
-  constructor(x, y, { height, heightNoise, cloudNoise, biome, temperature }) {
+  constructor(x, y, { world, height, heightNoise, cloudNoise, biome, temperature }) {
     this._x = x;
     this._y = y;
 
     this._blocks = [];
     this._needToBake = false;
+    this._world = world;
 
     this._canvas = document.createElement("canvas");
     this._canvas.width = World.ChunkSize[0] * Application.TEXTURE_SIZE;
@@ -18,7 +19,7 @@ class Chunk {
     this.height = height;
     this.temperature = temperature;
 
-    this.animationTime = 500 / (Application.World.camera.getSpeed() != 0 ? Application.World.camera.getSpeed() : 1);
+    this.animationTime = 500 / (this._world.camera.getSpeed() != 0 ? this._world.camera.getSpeed() : 1);
     this.currentAnimationTime = this.animationTime;
   }
 

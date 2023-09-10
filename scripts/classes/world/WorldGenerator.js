@@ -215,7 +215,7 @@ class WorldGenerator {
       })
     }
 
-    let chunk = new Chunk(x, y, { biome: chunkBiome, temperature: chunkTemperature, height: chunkHeight, heightNoise, cloudNoise })
+    let chunk = new Chunk(x, y, { world, biome: chunkBiome, temperature: chunkTemperature, height: chunkHeight, heightNoise, cloudNoise })
 
     for (let chunkY = 0; chunkY < World.ChunkSize[1]; chunkY++) {
       for (let chunkX = 0; chunkX < World.ChunkSize[0]; chunkX++) {

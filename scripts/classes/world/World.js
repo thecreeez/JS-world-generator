@@ -79,6 +79,9 @@ class World {
     let chunkSize = camera.getChunkSizeOnScreen();
     let chunksBoundsToRender = this.getChunkBoundsToRender();
 
+    //ChunkRenderer.render(this.getChunk(0,0), canvas)
+    //return;
+
     ctx.save()
     ctx.translate(canvas.width / 2 - chunkSize / 2 - camera.getPos()[0] * (chunkSize / World.ChunkSize[0]), canvas.height / 2 - chunkSize / 2 - camera.getPos()[1] * (chunkSize / World.ChunkSize[0]));
 
@@ -88,13 +91,15 @@ class World {
       for (let x = chunksBoundsToRender.min[0]; x < chunksBoundsToRender.max[0]; x++) {
         let renderChunk = this.getChunk(x, y);
         if (renderChunk) {
-          ctx.drawImage(renderChunk.getCanvas(Camera.RENDER_TYPE), x * chunkSize - 0.5, y * chunkSize - 0.5, chunkSize + 1, chunkSize + 1);
+          let chunkPos = ChunkRenderer.cartToIso([x * chunkSize / 2, y * chunkSize / 2]);
+          ctx.drawImage(renderChunk.getCanvas(Camera.RENDER_TYPE), chunkPos[0], chunkPos[1], chunkSize + 1, chunkSize + 1);
 
           chunksToRender++;
           // Если чанк камеры
           if (Application.DEBUG_MODE && x == camera.getChunkPos()[0] && y == camera.getChunkPos()[1]) {
-            ctx.fillStyle = `rgba(255,255,255,0.5)`;
-            ctx.fillRect(x * chunkSize, y * chunkSize, chunkSize, chunkSize);
+            ctx.fillStyle = `rgba(0,0,0,0.5)`;
+            let cameraSelectPos = ChunkRenderer.cartToIso([x * chunkSize / 2, y * chunkSize / 2]);
+            ctx.fillRect(cameraSelectPos[0], cameraSelectPos[1], chunkSize, chunkSize);
           }
 
           let chunkFogAlpha = (MathHelper.getVectorLength([x - camera.getPos()[0] / World.ChunkSize[0], y - camera.getPos()[1] / World.ChunkSize[1]]) / (camera._distanceToRender));

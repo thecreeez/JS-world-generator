@@ -62,6 +62,9 @@ class Chunk {
 
   // Рендер чанка в контексте и особой позиции
   _bake({ renderType = Camera.RENDER_TYPES.DEFAULT, alpha = 0} = {}) {
+    this.alternateBake(renderType)
+    return;
+
     let ctx = this._canvas.getContext("2d");
 
     for (let y = 0; y < World.ChunkSize[1]; y++) {
@@ -80,7 +83,7 @@ class Chunk {
          
         ctx.fillRect(x * Application.TEXTURE_SIZE, y * Application.TEXTURE_SIZE, Application.TEXTURE_SIZE, Application.TEXTURE_SIZE);
 
-        ctx.fillStyle = `rgba(255,255,255,${this.cloudNoise[y][x]})`;
+        ctx.fillStyle = `rgba(255,255,255,${1 - this.cloudNoise[y][x]})`;
         ctx.fillRect(x * Application.TEXTURE_SIZE, y * Application.TEXTURE_SIZE, Application.TEXTURE_SIZE, Application.TEXTURE_SIZE);
       }
     }
@@ -104,6 +107,12 @@ class Chunk {
       if (adjacentChunks[side])
         Application.EventBus.invoke(EventType.ON_NEARBY_CHUNK_BAKE, { chunk: adjacentChunks[side], side, baked: this });
     }
+  }
+
+  alternateBake(renderType) {
+    ChunkRenderer.render(this);
+    this._renderType = renderType;
+    this._needToBake = false;
   }
 
   setNeedToBake(value) {

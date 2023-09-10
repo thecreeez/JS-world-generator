@@ -11,14 +11,11 @@ ctx.msImageSmoothingEnabled = false;
 ctx.imageSmoothingEnabled = false;
 
 window.onload = () => {
-  //Application.start({
-  //  debug: true,
-  //  ticksPerSecond: 60,
-  //  fpsMax: 165
-  //});
-
-  let world = new World({  })
-  ChunkRenderer.render(world);
+  Application.start({
+    debug: true,
+    ticksPerSecond: 60,
+    fpsMax: 165
+  });
 }
 
 /**

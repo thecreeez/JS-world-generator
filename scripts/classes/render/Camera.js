@@ -60,7 +60,7 @@ class Camera {
   }
 
   getPos() {
-    return [Math.floor(this._pos[0] * 100) / 100, Math.floor(this._pos[1] * 100) / 100];
+    return ChunkRenderer.cartToIso([Math.floor(this._pos[0] * 100) / 200, Math.floor(this._pos[1] * 100) / 200]);
   }
 
   getDistanceToRender() {

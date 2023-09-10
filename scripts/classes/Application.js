@@ -5,7 +5,7 @@ class Application {
   static World;
   static DEBUG_MODE = false;
 
-  static TEXTURE_SIZE = 1;
+  static TEXTURE_SIZE = 10;
 
   static MAX_FPS = 60;
   static MAX_TICKS = 20;
@@ -28,7 +28,7 @@ class Application {
     SeedRandom: "Псевдослучайно"
   }
 
-  static RandomMethod = Application.RandomTypes.FullRandom;
+  static RandomMethod = Application.RandomTypes.SeedRandom;
 
   static Profilers = {
     FPS_PROFILER: DebugHelper.createProfiler(),
@@ -55,7 +55,7 @@ class Application {
     }
 
     Application.World = new World({
-      seed: MathHelper.randomSeed()
+      seed: 17182
     })
 
     setInterval(() => {
@@ -90,11 +90,13 @@ class Application {
     window.onkeydown = (e) => {
       Application.UIManager.onkeydown(e.key, e.code)
 
+      let speed = Application.World.camera.getSpeed();
+
       switch (e.code) {
-        case "KeyW": Application.World.camera.move([0, -Application.World.camera.getSpeed()]);  break;
-        case "KeyA": Application.World.camera.move([-Application.World.camera.getSpeed(), 0]); break;
-        case "KeyS": Application.World.camera.move([0, Application.World.camera.getSpeed()]); break;
-        case "KeyD": Application.World.camera.move([Application.World.camera.getSpeed(), 0]); break;
+        case "KeyW": Application.World.camera.move(ChunkRenderer.cartToIso([-speed, -speed]));  break;
+        case "KeyA": Application.World.camera.move(ChunkRenderer.cartToIso([-speed, speed])); break;
+        case "KeyS": Application.World.camera.move(ChunkRenderer.cartToIso([speed, speed])); break;
+        case "KeyD": Application.World.camera.move(ChunkRenderer.cartToIso([speed, -speed])); break;
         case "Enter": {
           let chunkPos = Application.World.camera.getChunkPos();
           Application.World.setChunk(chunkPos[0], chunkPos[1], WorldGenerator.generateChunk(Application.World, chunkPos[0], chunkPos[1], Application.World.getAdjacentChunks(chunkPos[0], chunkPos[1])))

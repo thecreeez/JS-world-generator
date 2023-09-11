@@ -12,10 +12,10 @@ class ChunkRenderer {
     ctx.globalAlpha = 1;
     
 
-    let blockSize = canvas.height / (World.ChunkSize[0] + 1);
+    let blockSize = canvas.height / (World.ChunkSize[0]) / 2;
 
     ctx.save();
-    ctx.translate(canvas.width / 2, blockSize);
+    ctx.translate(canvas.width / 2, blockSize * World.ChunkSize[1]);
     chunk.heightNoise.forEach((noiseLine, y) => {
       noiseLine.forEach((noiseValue, x) => {
         let isoPos = ChunkRenderer.cartToIso([x, y]);
@@ -31,6 +31,10 @@ class ChunkRenderer {
     })
     ctx.restore();
     ctx.restore();
+
+    ctx.fillStyle = "black";
+    ctx.font = "10px arial"
+    ctx.fillText(`[${chunk._x},${chunk._y}]`, 0, canvas.height - 10);
 
     if (chunk._x == 0 && chunk._y == 0) {
       //ctx.fillStyle = `rgba(255,0,0,0.5)`;

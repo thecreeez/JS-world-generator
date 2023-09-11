@@ -25,7 +25,7 @@ class BiomeTypes {
       biomeBlockType: BlockTypes.SAND
     })
       .addBlock(Biome.createBlockGenerateSettings(BlockTypes.OCEAN, 20))
-      .addBlock(Biome.createBlockGenerateSettings(BlockTypes.SAND, 40))
+      .addBlock(Biome.createBlockGenerateSettings(BlockTypes.SAND, 20))
       .addBlock(Biome.createBlockGenerateSettings(BlockTypes.GRASS, 60)),
 
     new Biome({
@@ -36,17 +36,19 @@ class BiomeTypes {
       biomeBlockType: BlockTypes.GRASS
     })
       .addBlock(Biome.createBlockGenerateSettings(BlockTypes.OCEAN, 20))
-      .addBlock(Biome.createBlockGenerateSettings(BlockTypes.SAND, 40))
+      .addBlock(Biome.createBlockGenerateSettings(BlockTypes.SAND, 20))
       .addBlock(Biome.createBlockGenerateSettings(BlockTypes.GRASS, 60)),
     new Biome({
       id: "mountains",
-      heightWeight: 10,
+      heightWeight: 1000,
       temperatureWeight: 10,
-      blockHeightNaturalBounds: [50, 240],
+      blockHeightNaturalBounds: [50, 350],
       biomeBlockType: BlockTypes.GRASS
     })
       .addBlock(Biome.createBlockGenerateSettings(BlockTypes.OCEAN, 20))
-      .addBlock(Biome.createBlockGenerateSettings(BlockTypes.SAND, 80))
+      .addBlock(Biome.createBlockGenerateSettings(BlockTypes.SAND, 40))
       .addBlock(Biome.createBlockGenerateSettings(BlockTypes.GRASS, 80))
+      .addBlock(Biome.createBlockGenerateSettings(BlockTypes.MOUNTAIN, 100))
+      .addBlock(Biome.createBlockGenerateSettings(BlockTypes.HIGH_MOUNTAIN, 100)),
   ]
 }

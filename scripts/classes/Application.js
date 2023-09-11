@@ -5,7 +5,7 @@ class Application {
   static World;
   static DEBUG_MODE = false;
 
-  static TEXTURE_SIZE = 10;
+  static TEXTURE_SIZE = 20;
 
   static MAX_FPS = 60;
   static MAX_TICKS = 20;

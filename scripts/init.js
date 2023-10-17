@@ -12,7 +12,7 @@ ctx.imageSmoothingEnabled = false;
 
 window.onload = () => {
   Application.start({
-    debug: true,
+    debug: false,
     ticksPerSecond: 60,
     fpsMax: 165
   });

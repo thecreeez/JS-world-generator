@@ -60,7 +60,7 @@ class Chunk {
   }
 
   // Рендер чанка в контексте и особой позиции
-  _bake({ renderType = Camera.RENDER_TYPES.DEFAULT, alpha = 0} = {}) {
+  _bake({ renderType = Camera.RENDER_TYPES.DEFAULT, alpha = 1} = {}) {
     let ctx = this._canvas.getContext("2d");
 
     for (let y = 0; y < World.ChunkSize[1]; y++) {
@@ -79,7 +79,8 @@ class Chunk {
          
         ctx.fillRect(x * Application.TEXTURE_SIZE, y * Application.TEXTURE_SIZE, Application.TEXTURE_SIZE, Application.TEXTURE_SIZE);
 
-        ctx.fillStyle = `rgba(255,255,255,${this.cloudNoise[y][x]})`;
+        // NEED TO NERF THE CLOUD NOISE
+        ctx.fillStyle = `rgba(255,255,255,${1 - this.cloudNoise[y][x]})`;
         ctx.fillRect(x * Application.TEXTURE_SIZE, y * Application.TEXTURE_SIZE, Application.TEXTURE_SIZE, Application.TEXTURE_SIZE);
       }
     }
@@ -90,7 +91,7 @@ class Chunk {
       ctx.strokeRect(0, 0, this._canvas.width, this._canvas.height);
     }
 
-    ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+    ctx.fillStyle = `rgba(255,255,255,${1 - alpha})`;
     ctx.fillRect(0, 0, this._canvas.width, this._canvas.height);
 
     this._renderType = renderType;
